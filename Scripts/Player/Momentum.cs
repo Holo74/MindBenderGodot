@@ -1,0 +1,256 @@
+using Godot;
+using System;
+
+public class Momentum : BaseAttatch
+{
+    public Momentum(PlayerController controller) : base(controller, true) { }
+    private Vector3 groundMove = new Vector3();
+    private Vector3 horizontalAcc = new Vector3();
+    private Vector3 verticalMove = new Vector3();
+    private Vector3 stableMove = new Vector3();
+    private Vector3 pushing = new Vector3();
+    private float currentSpeed = 0;
+    private bool moved = false;
+    private float NinetyDegreesToRad = Mathf.Deg2Rad(-90);
+    private RayInfo groundData { get { return RayCastData.SurroundingCasts[RayDirections.Bottom]; } }
+    private bool groundColliding { get { return PlayerAreaSensor.area[AreaSensorDirection.Bottom]; } }
+    private float maxSpeed = 1;
+    private float maxAirSpeed = 0;
+    private float accelerate = 1f, currentAccelerationTime = 6f;
+
+    public Vector3 GetVerticalMove()
+    {
+        return verticalMove;
+    }
+
+    public Vector3 GetGroundMove()
+    {
+        return groundMove;
+    }
+    public override void Update(float delta)
+    {
+        base.Update(delta);
+        if (groundColliding)
+        {
+            if (!moved)
+            {
+                if (currentSpeed < .1f)
+                {
+                    switch (controller.ability.GetCurrentState())
+                    {
+                        case PlayerState.sprinting:
+                        case PlayerState.walking:
+                            Stop();
+                            SetState(PlayerState.standing);
+                            break;
+                        case PlayerState.crouch:
+                            Stop();
+                            break;
+                    }
+                }
+                if (controller.ability.GetCurrentState() != PlayerState.slide)
+                {
+                    currentSpeed -= currentSpeed * time * PlayerOptions.walkingDeceleration;
+                }
+            }
+            else
+            {
+                if (controller.size.crouched)
+                {
+                    if (accelerate > 1.1f)
+                    {
+                        SetState(PlayerState.slide);
+                    }
+                    else
+                    {
+                        SetState(PlayerState.crouch);
+                    }
+                }
+                else
+                {
+                    if (maxSpeed == PlayerOptions.playerMaxWalkingSpeed)
+                    {
+                        SetState(PlayerState.walking);
+                    }
+                    else
+                    {
+                        SetState(PlayerState.sprinting);
+                    }
+                }
+                if (currentSpeed > maxSpeed)
+                    currentSpeed = Mathf.Clamp(currentSpeed - time * PlayerOptions.playerDeccelerationAboveMax, maxSpeed, currentSpeed);
+            }
+            if (groundData.colliding)
+            {
+                controller.MoveAndSlide(groundData.normal.Cross(stableMove.Rotated(Vector3.Up, NinetyDegreesToRad)).Normalized() * currentSpeed * accelerate);
+            }
+            else
+            {
+                controller.MoveAndSlide(stableMove.Normalized() * currentSpeed * accelerate);
+            }
+            horizontalAcc -= horizontalAcc * time * .9f;
+        }
+        else
+        {
+            if (controller.ability.GetCurrentState() != PlayerState.wallRunning && controller.ability.GetCurrentState() != PlayerState.glide)
+            {
+                if (verticalMove.y > 0)
+                {
+                    SetState(PlayerState.fallingUp);
+                }
+                else
+                {
+                    SetState(PlayerState.fallingDown);
+                }
+            }
+            controller.MoveAndSlide(stableMove * accelerate);
+            switch (controller.ability.GetCurrentState())
+            {
+                case PlayerState.wallRunning:
+                    verticalMove += Vector3.Down * time * PlayerOptions.wallRunningGravity;
+                    break;
+                case PlayerState.glide:
+                    verticalMove = Vector3.Down * PlayerOptions.glideFallSpeed;
+                    break;
+                default:
+                    verticalMove += Vector3.Down * time * PlayerOptions.gravity;
+                    break;
+            }
+        }
+        controller.MoveAndSlide(verticalMove);
+        controller.MoveAndSlide(horizontalAcc);
+        controller.MoveAndSlide(pushing);
+        if (currentAccelerationTime < PlayerOptions.slideMaxTime)
+        {
+            currentAccelerationTime += time;
+        }
+        else
+        {
+            accelerate = Mathf.Clamp(accelerate - PlayerOptions.slideDeceleration * time, 1, accelerate);
+        }
+        pushing = Vector3.Zero;
+        if (controller.ability.GetCurrentState() != PlayerState.slide)
+            moved = false;
+    }
+
+    public void GroundMovement(Vector3 direction, float maxSpeed, float acceleration)
+    {
+        if (!moved && groundColliding)
+            stableMove = Vector3.Zero;
+        moved = true;
+        if (groundColliding)
+        {
+            stableMove += direction;
+            this.maxSpeed = maxSpeed;
+            currentSpeed = Mathf.Clamp(direction.Length() * time * acceleration + currentSpeed, 0, 100);
+        }
+    }
+
+    public void AirMovement(Vector3 direction, float control)
+    {
+        moved = true;
+        stableMove += direction * time * control * (Mathf.Clamp(currentSpeed, 1, maxAirSpeed) / Mathf.Clamp(maxAirSpeed, 1, 100));
+        if (stableMove.Length() > maxAirSpeed)
+            stableMove *= (maxAirSpeed / stableMove.Length());
+    }
+
+    public void Stop()
+    {
+        verticalMove = Vector3.Zero;
+        horizontalAcc = Vector3.Zero;
+        stableMove = Vector3.Zero;
+        pushing = Vector3.Zero;
+        accelerate = 1f;
+        currentSpeed = 0;
+    }
+
+    public void Accelerate(float amount = 1)
+    {
+        accelerate = amount;
+        if (accelerate != 1)
+        {
+            currentAccelerationTime = 0;
+        }
+
+    }
+
+    public float GetCurrentSpeed()
+    {
+        return currentSpeed;
+    }
+
+    public float GetAccelerate()
+    {
+        return accelerate;
+    }
+    public float GetMaxSpeed()
+    {
+        return maxSpeed;
+    }
+
+    public void HorizontalAccelerationSet(Vector3 vec)
+    {
+        horizontalAcc = vec;
+    }
+
+    public void SetPushing(Vector3 vec)
+    {
+        pushing = vec;
+    }
+    public float GetFallVerticalSpeed()
+    {
+        return verticalMove.Length();
+    }
+
+    public float GetHorAcceleration()
+    {
+        return horizontalAcc.Length();
+    }
+
+    public void VerticalIncrease(float amount)
+    {
+        SetState(PlayerState.fallingUp);
+        verticalMove = Vector3.Up * amount;
+    }
+
+    public void ChangeStableVectorDirection(Vector3 direction)
+    {
+        float speed = stableMove.Length();
+        stableMove = direction.Normalized();
+        stableMove *= speed;
+    }
+
+    private void SetState(PlayerState state)
+    {
+        controller.ability.ChangeState(state);
+    }
+
+    public void LandingSignal(bool state)
+    {
+        if (state)
+        {
+            currentSpeed = stableMove.Length() + horizontalAcc.Length();
+            horizontalAcc = Vector3.Zero;
+            verticalMove = Vector3.Zero;
+
+            if (currentSpeed > .1f)
+            {
+                SetState(PlayerState.walking);
+            }
+            else
+            {
+                SetState(PlayerState.standing);
+                Stop();
+            }
+            if (verticalMove.y < 1)
+            {
+                controller.TakeDamage(-verticalMove.y, DamageType.environmental);
+            }
+        }
+        else
+        {
+            maxAirSpeed = currentSpeed;
+            stableMove = stableMove.Normalized() * currentSpeed;
+        }
+    }
+}

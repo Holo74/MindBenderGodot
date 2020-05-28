@@ -2,16 +2,14 @@ using Godot;
 using System;
 using Godot.Collections;
 
+//This is the player values that I was testsing in the very beginning
 public class PlayerOptions : Node
 {
     public static PlayerOptions Instance { get; private set; }
-    public float mouseXSensitivity = -.2f;
-    public float mouseYSensitivity = -.2f;
-    public bool toggleSprint = false;
-    public float cameraFOV = 70f;
+    //I need to put these in to the settings area which will be in the game manager
+
     public const float playerWalkingSpeed = 10f;
     public const float playerMaxWalkingSpeed = 3.5f;
-    //public float playerWalkingDamping = 5f; Was used for a different walking system
     public const float playerCrouchSpeed = 6f;
     public const float airMovementPush = 7f;
     public const float walkingDeceleration = 10f;
@@ -36,23 +34,7 @@ public class PlayerOptions : Node
     public const float slideDeceleration = 2f;
     public const float glidePull = 13f;
     public const float glideFallSpeed = .5f;
-    public void SetData(Dictionary data)
-    {
-        mouseXSensitivity = (float)data["mouseXSensitivity"];
-        mouseYSensitivity = (float)data["mouseYSensitivity"];
-        toggleSprint = (bool)data["toggleSprint"];
-        cameraFOV = (float)data["cameraFOV"];
 
-    }
-    public Dictionary GetData()
-    {
-        Dictionary data = new Dictionary();
-        data.Add("mouseXSensitivity", mouseXSensitivity);
-        data.Add("mouseYSensitivity", mouseYSensitivity);
-        data.Add("toggleSprint", toggleSprint);
-        data.Add("cameraFOV", cameraFOV);
-        return data;
-    }
     public override void _Ready()
     {
         Instance = this;

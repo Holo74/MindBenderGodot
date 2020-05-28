@@ -1,0 +1,400 @@
+[gd_scene load_steps=7 format=2]
+
+[ext_resource path="res://Textures/CrosHair.png" type="Texture" id=1]
+[ext_resource path="res://Scripts/Data/InputMapping.cs" type="Script" id=2]
+[ext_resource path="res://Scripts/Menu/InGameMenu.cs" type="Script" id=3]
+[ext_resource path="res://Scripts/Menu/FPSCounter.cs" type="Script" id=5]
+[ext_resource path="res://Scripts/Menu/StateShower.cs" type="Script" id=7]
+[ext_resource path="res://Scripts/Menu/SpeedDisplay.cs" type="Script" id=9]
+
+[node name="CanvasLayer" type="CanvasLayer"]
+pause_mode = 2
+
+[node name="InGameMenuAndHud" type="Control" parent="."]
+anchor_right = 1.0
+anchor_bottom = 1.0
+script = ExtResource( 3 )
+__meta__ = {
+"_edit_use_anchors_": false
+}
+pathToQuit = NodePath("OptionsMenu/Quit")
+pathToHealthConatiner = NodePath("PlayerHud/Health")
+
+[node name="PlayerHud" type="Control" parent="InGameMenuAndHud"]
+anchor_right = 1.0
+anchor_bottom = 1.0
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="FPS" type="Label" parent="InGameMenuAndHud/PlayerHud"]
+anchor_right = 0.0390625
+anchor_bottom = 0.0233333
+text = "FPS:"
+script = ExtResource( 5 )
+__meta__ = {
+"_edit_use_anchors_": true
+}
+
+[node name="Speed" type="Label" parent="InGameMenuAndHud/PlayerHud"]
+anchor_top = 0.0523474
+anchor_right = 0.0390626
+anchor_bottom = 0.0756807
+text = "Speed: "
+script = ExtResource( 9 )
+__meta__ = {
+"_edit_use_anchors_": true
+}
+
+[node name="State" type="Label" parent="InGameMenuAndHud/PlayerHud"]
+anchor_top = 0.112364
+anchor_right = 0.0458984
+anchor_bottom = 0.135697
+text = "Speed: "
+script = ExtResource( 7 )
+__meta__ = {
+"_edit_use_anchors_": true
+}
+
+[node name="Crosshair" type="TextureRect" parent="InGameMenuAndHud/PlayerHud"]
+anchor_left = 0.480469
+anchor_top = 0.466667
+anchor_right = 0.519531
+anchor_bottom = 0.533333
+margin_bottom = -3.05176e-05
+texture = ExtResource( 1 )
+expand = true
+stretch_mode = 6
+__meta__ = {
+"_edit_use_anchors_": true
+}
+
+[node name="Health" type="Control" parent="InGameMenuAndHud/PlayerHud"]
+anchor_left = 0.25
+anchor_top = 0.0666667
+anchor_right = 0.75
+anchor_bottom = 0.12
+margin_top = -3.8147e-06
+__meta__ = {
+"_edit_group_": true,
+"_edit_use_anchors_": true
+}
+
+[node name="ProgressBar" type="ProgressBar" parent="InGameMenuAndHud/PlayerHud/Health"]
+anchor_right = 1.0
+anchor_bottom = 1.0
+max_value = 99.0
+value = 99.0
+rounded = true
+percent_visible = false
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="Display" type="RichTextLabel" parent="InGameMenuAndHud/PlayerHud"]
+anchor_top = 0.579014
+anchor_right = 1.0
+anchor_bottom = 0.715681
+bbcode_enabled = true
+scroll_active = false
+__meta__ = {
+"_edit_use_anchors_": true
+}
+
+[node name="Timer" type="Timer" parent="InGameMenuAndHud/PlayerHud/Display"]
+one_shot = true
+
+[node name="OptionsMenu" type="Panel" parent="InGameMenuAndHud"]
+visible = false
+anchor_right = 1.0
+anchor_bottom = 1.0
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="Actual Control Settings" type="TabContainer" parent="InGameMenuAndHud/OptionsMenu"]
+anchor_left = 0.310649
+anchor_top = 0.0756807
+anchor_right = 0.650493
+anchor_bottom = 0.807347
+__meta__ = {
+"_edit_use_anchors_": true
+}
+
+[node name="Inputs" type="Tabs" parent="InGameMenuAndHud/OptionsMenu/Actual Control Settings"]
+anchor_right = 1.0
+anchor_bottom = 1.0
+margin_left = 4.0
+margin_top = 32.0
+margin_right = -4.0
+margin_bottom = -4.0
+
+[node name="Jump" type="Control" parent="InGameMenuAndHud/OptionsMenu/Actual Control Settings/Inputs"]
+anchor_top = 0.347395
+anchor_right = 0.991176
+anchor_bottom = 0.40943
+script = ExtResource( 2 )
+__meta__ = {
+"_edit_use_anchors_": true
+}
+
+[node name="Button" type="Button" parent="InGameMenuAndHud/OptionsMenu/Actual Control Settings/Inputs/Jump"]
+anchor_right = 0.350148
+anchor_bottom = 1.0
+__meta__ = {
+"_edit_use_anchors_": true
+}
+
+[node name="RichTextLabel" type="RichTextLabel" parent="InGameMenuAndHud/OptionsMenu/Actual Control Settings/Inputs/Jump"]
+anchor_left = 0.421365
+anchor_right = 1.0
+anchor_bottom = 1.0
+text = "Jump Button"
+__meta__ = {
+"_edit_use_anchors_": true
+}
+
+[node name="Crouch" type="Control" parent="InGameMenuAndHud/OptionsMenu/Actual Control Settings/Inputs"]
+anchor_top = 0.434244
+anchor_right = 0.991176
+anchor_bottom = 0.496278
+script = ExtResource( 2 )
+__meta__ = {
+"_edit_use_anchors_": true
+}
+inputName = "Crouch"
+
+[node name="Button" type="Button" parent="InGameMenuAndHud/OptionsMenu/Actual Control Settings/Inputs/Crouch"]
+anchor_right = 0.350148
+anchor_bottom = 1.0
+__meta__ = {
+"_edit_use_anchors_": true
+}
+
+[node name="RichTextLabel" type="RichTextLabel" parent="InGameMenuAndHud/OptionsMenu/Actual Control Settings/Inputs/Crouch"]
+anchor_left = 0.421365
+anchor_right = 1.0
+anchor_bottom = 1.0
+text = "Crouch Button"
+__meta__ = {
+"_edit_use_anchors_": true
+}
+
+[node name="Move Forward" type="Control" parent="InGameMenuAndHud/OptionsMenu/Actual Control Settings/Inputs"]
+anchor_right = 0.991176
+anchor_bottom = 0.0620348
+script = ExtResource( 2 )
+__meta__ = {
+"_edit_use_anchors_": true
+}
+inputName = "MoveForward"
+
+[node name="Button" type="Button" parent="InGameMenuAndHud/OptionsMenu/Actual Control Settings/Inputs/Move Forward"]
+anchor_right = 0.350148
+anchor_bottom = 1.0
+__meta__ = {
+"_edit_use_anchors_": true
+}
+
+[node name="RichTextLabel" type="RichTextLabel" parent="InGameMenuAndHud/OptionsMenu/Actual Control Settings/Inputs/Move Forward"]
+anchor_left = 0.421365
+anchor_right = 1.0
+anchor_bottom = 1.0
+text = "Move Forward Button"
+__meta__ = {
+"_edit_use_anchors_": true
+}
+
+[node name="Move Back" type="Control" parent="InGameMenuAndHud/OptionsMenu/Actual Control Settings/Inputs"]
+anchor_top = 0.0868487
+anchor_right = 0.991176
+anchor_bottom = 0.148884
+script = ExtResource( 2 )
+__meta__ = {
+"_edit_use_anchors_": true
+}
+inputName = "MoveBack"
+
+[node name="Button" type="Button" parent="InGameMenuAndHud/OptionsMenu/Actual Control Settings/Inputs/Move Back"]
+anchor_right = 0.350148
+anchor_bottom = 1.0
+__meta__ = {
+"_edit_use_anchors_": true
+}
+
+[node name="RichTextLabel" type="RichTextLabel" parent="InGameMenuAndHud/OptionsMenu/Actual Control Settings/Inputs/Move Back"]
+anchor_left = 0.421365
+anchor_right = 1.0
+anchor_bottom = 1.0
+text = "Move Back Button"
+__meta__ = {
+"_edit_use_anchors_": true
+}
+
+[node name="Move Left" type="Control" parent="InGameMenuAndHud/OptionsMenu/Actual Control Settings/Inputs"]
+anchor_top = 0.173697
+anchor_right = 0.991176
+anchor_bottom = 0.235732
+script = ExtResource( 2 )
+__meta__ = {
+"_edit_use_anchors_": true
+}
+inputName = "MoveLeft"
+
+[node name="Button" type="Button" parent="InGameMenuAndHud/OptionsMenu/Actual Control Settings/Inputs/Move Left"]
+anchor_right = 0.350148
+anchor_bottom = 1.0
+__meta__ = {
+"_edit_use_anchors_": true
+}
+
+[node name="RichTextLabel" type="RichTextLabel" parent="InGameMenuAndHud/OptionsMenu/Actual Control Settings/Inputs/Move Left"]
+anchor_left = 0.421365
+anchor_right = 1.0
+anchor_bottom = 1.0
+text = "Move Left Button"
+__meta__ = {
+"_edit_use_anchors_": true
+}
+
+[node name="Move Right" type="Control" parent="InGameMenuAndHud/OptionsMenu/Actual Control Settings/Inputs"]
+anchor_top = 0.260546
+anchor_right = 0.991176
+anchor_bottom = 0.322581
+script = ExtResource( 2 )
+__meta__ = {
+"_edit_use_anchors_": true
+}
+inputName = "MoveRight"
+
+[node name="Button" type="Button" parent="InGameMenuAndHud/OptionsMenu/Actual Control Settings/Inputs/Move Right"]
+anchor_right = 0.350148
+anchor_bottom = 1.0
+__meta__ = {
+"_edit_use_anchors_": true
+}
+
+[node name="RichTextLabel" type="RichTextLabel" parent="InGameMenuAndHud/OptionsMenu/Actual Control Settings/Inputs/Move Right"]
+anchor_left = 0.421365
+anchor_right = 1.0
+anchor_bottom = 1.0
+text = "Move Right Button"
+__meta__ = {
+"_edit_use_anchors_": true
+}
+
+[node name="Sprint" type="Control" parent="InGameMenuAndHud/OptionsMenu/Actual Control Settings/Inputs"]
+anchor_top = 0.521092
+anchor_right = 0.991176
+anchor_bottom = 0.583127
+margin_bottom = 1.52588e-05
+script = ExtResource( 2 )
+__meta__ = {
+"_edit_use_anchors_": true
+}
+inputName = "Sprint"
+
+[node name="Button" type="Button" parent="InGameMenuAndHud/OptionsMenu/Actual Control Settings/Inputs/Sprint"]
+anchor_right = 0.350148
+anchor_bottom = 1.0
+__meta__ = {
+"_edit_use_anchors_": true
+}
+
+[node name="RichTextLabel" type="RichTextLabel" parent="InGameMenuAndHud/OptionsMenu/Actual Control Settings/Inputs/Sprint"]
+anchor_left = 0.421365
+anchor_right = 1.0
+anchor_bottom = 1.0
+text = "Sprint Button"
+__meta__ = {
+"_edit_use_anchors_": true
+}
+
+[node name="Strafe Jump" type="Control" parent="InGameMenuAndHud/OptionsMenu/Actual Control Settings/Inputs"]
+anchor_top = 0.607941
+anchor_right = 0.991176
+anchor_bottom = 0.669976
+margin_bottom = 1.52588e-05
+script = ExtResource( 2 )
+__meta__ = {
+"_edit_use_anchors_": true
+}
+inputName = "Strafe"
+
+[node name="Button" type="Button" parent="InGameMenuAndHud/OptionsMenu/Actual Control Settings/Inputs/Strafe Jump"]
+anchor_right = 0.350148
+anchor_bottom = 1.0
+__meta__ = {
+"_edit_use_anchors_": true
+}
+
+[node name="RichTextLabel" type="RichTextLabel" parent="InGameMenuAndHud/OptionsMenu/Actual Control Settings/Inputs/Strafe Jump"]
+anchor_left = 0.421365
+anchor_right = 1.0
+anchor_bottom = 1.0
+text = "Strafe Jump"
+__meta__ = {
+"_edit_use_anchors_": true
+}
+
+[node name="Throw" type="Control" parent="InGameMenuAndHud/OptionsMenu/Actual Control Settings/Inputs"]
+anchor_top = 0.69479
+anchor_right = 0.991176
+anchor_bottom = 0.756825
+__meta__ = {
+"_edit_use_anchors_": true
+}
+
+[node name="Button" type="Button" parent="InGameMenuAndHud/OptionsMenu/Actual Control Settings/Inputs/Throw"]
+anchor_right = 0.350148
+anchor_bottom = 1.0
+disabled = true
+text = "Mouse Left click"
+__meta__ = {
+"_edit_use_anchors_": true
+}
+
+[node name="RichTextLabel" type="RichTextLabel" parent="InGameMenuAndHud/OptionsMenu/Actual Control Settings/Inputs/Throw"]
+anchor_left = 0.421365
+anchor_right = 1.0
+anchor_bottom = 1.0
+text = "Fire Button"
+__meta__ = {
+"_edit_use_anchors_": true
+}
+
+[node name="Hitting" type="Control" parent="InGameMenuAndHud/OptionsMenu/Actual Control Settings/Inputs"]
+anchor_top = 0.781639
+anchor_right = 0.991176
+anchor_bottom = 0.843674
+__meta__ = {
+"_edit_use_anchors_": true
+}
+
+[node name="Button" type="Button" parent="InGameMenuAndHud/OptionsMenu/Actual Control Settings/Inputs/Hitting"]
+anchor_right = 0.350148
+anchor_bottom = 1.0
+disabled = true
+text = "Mouse Right click"
+__meta__ = {
+"_edit_use_anchors_": true
+}
+
+[node name="RichTextLabel" type="RichTextLabel" parent="InGameMenuAndHud/OptionsMenu/Actual Control Settings/Inputs/Hitting"]
+anchor_left = 0.421365
+anchor_right = 1.0
+anchor_bottom = 1.0
+text = "Hit Button"
+__meta__ = {
+"_edit_use_anchors_": true
+}
+
+[node name="Quit" type="Button" parent="InGameMenuAndHud/OptionsMenu"]
+anchor_left = 0.7382
+anchor_top = 0.0373638
+anchor_right = 0.978435
+anchor_bottom = 0.112364
+text = "Quit"
+__meta__ = {
+"_edit_use_anchors_": true
+}

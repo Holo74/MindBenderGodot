@@ -1,6 +1,7 @@
 using Godot;
 using System.Collections.Generic;
 
+//Used to detect if something is in a very specific location  Used to get normals mostly
 public class RayCastData : RayCast
 {
     public static Dictionary<RayDirections, RayInfo> SurroundingCasts;
@@ -26,6 +27,8 @@ public class RayCastData : RayCast
     public override void _PhysicsProcess(float delta)
     {
         bool currentState = IsColliding();
+        if (!SurroundingCasts.ContainsKey(current))
+            return;
         if (currentState != SurroundingCasts[current].colliding)
             EmitSignal(nameof(ChangeState), currentState);
         SurroundingCasts[current].colliding = currentState;
@@ -34,6 +37,11 @@ public class RayCastData : RayCast
             SurroundingCasts[current].normal = GetCollisionNormal();
             SurroundingCasts[current].hit = (Node)(GetCollider());
         }
+    }
+
+    public static void ClearDic()
+    {
+        SurroundingCasts = new Dictionary<RayDirections, RayInfo>();
     }
 }
 

@@ -1,6 +1,7 @@
 using Godot;
 using System;
 
+//Filters all of the inputs and makes sure that any of the inputs are correct and then sends the request to the ability
 public class PlayerInput : BaseAttatch
 {
     private float timeDelta;
@@ -57,7 +58,7 @@ public class PlayerInput : BaseAttatch
 
     private bool SprintOutput()
     {
-        if (options.toggleSprint)
+        if (SettingsOptions.toggleSprint)
         {
             if (!sprintLock)
             {
@@ -81,8 +82,8 @@ public class PlayerInput : BaseAttatch
     {
         if (GameManager.Instance.playing)
         {
-            controller.bodyRotation.RotateAmount(vec.x * timeDelta * options.mouseXSensitivity);
-            controller.headRotation.RotateAmount(vec.y * timeDelta * options.mouseYSensitivity);
+            controller.bodyRotation.RotateAmount(vec.x * timeDelta * SettingsOptions.mouseXSensitivity);
+            controller.headRotation.RotateAmount(vec.y * timeDelta * SettingsOptions.mouseYSensitivity);
         }
 
     }

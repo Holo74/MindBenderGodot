@@ -1,17 +1,20 @@
 using Godot;
 using System;
 
-public abstract class HealthBase : KinematicBody
+///<summary>The basis for everything that is a kinematic body that also connects with health.  It should not be used by itself as it doesn't handle death</summary>
+public class HealthKinematic : KinematicBody, Health
 {
     private bool init = false;
-    private HealthBase master;
+    //Used in conjunction with another body that is considered the main body
+    private HealthKinematic master;
+    //Needs to be formated to have a certain amount of health
     public void Init(float maxHealth)
     {
         health = maxHealth;
         this.maxHealth = maxHealth;
         init = true;
     }
-    public void Init(HealthBase parent, float health)
+    public void Init(HealthKinematic parent, float health)
     {
         this.health = health;
         this.maxHealth = health;

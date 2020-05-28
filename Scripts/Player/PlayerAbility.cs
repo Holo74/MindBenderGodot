@@ -1,28 +1,34 @@
 using Godot;
 using System;
 
+//This controls how the abilities work and to process all the filtered inputs
 public class PlayerAbility : BaseAttatch
 {
     public PlayerAbility(PlayerController controller) : base(controller, true)
     {
-        temp = new ObjectPool<PlayerProjectiles>("TempProjectile.tscn", 30);
     }
 
-    public ObjectPool<PlayerProjectiles> temp { get; private set; }
     public bool DoubleJumpUsed = false, tripleJumpUsed = false;
     public float cayoteTime = 0f;
     private PlayerState currentState = PlayerState.standing;
     private WallRunningData right = new WallRunningData(RayDirections.Right, AreaSensorDirection.Right);
     private WallRunningData left = new WallRunningData(RayDirections.Left, AreaSensorDirection.Left);
+    public bool RunningOnRightWall = false;
     private WallRunningData attachedTo;
     private bool canSprint { get { return controller.upgrades.GetUpgrade(PlayerUpgrade.Sprinting); } }
     private float currentWallRunTime = 0f;
+    public delegate void StateChange(PlayerState state);
+    private StateChange stateChange;
 
+    public void AddToStateChange(StateChange function)
+    {
+        stateChange += function;
+    }
 
     public override void Update(float delta)
     {
         base.Update(delta);
-        if (!PlayerAreaSensor.area[AreaSensorDirection.Bottom] && cayoteTime < PlayerOptions.cayoteMaxTime)
+        if (!PlayerAreaSensor.GetArea(AreaSensorDirection.Bottom) && cayoteTime < PlayerOptions.cayoteMaxTime)
         {
             cayoteTime += time;
         }
@@ -112,7 +118,9 @@ public class PlayerAbility : BaseAttatch
     {
         if (!continuing)
             return false;
-        if (right.Sensed() || left.Sensed())
+        RunningOnRightWall = right.Sensed();
+
+        if (RunningOnRightWall || left.Sensed())
         {
             attachedTo = right.Sensed() ? right : left;
             if (attachedTo.Normals().Dot(controller.Transform.basis.z) > PlayerOptions.wallRunningAngleAllowance)
@@ -237,7 +245,7 @@ public class PlayerAbility : BaseAttatch
         //Need to reposition where the thing is thrown from and need to make it ignore the player.  
         //Along with having the cross hair change the size that it is depending on the distance you are from a target
         //Angle the object to the thing you are looking at
-        temp.Pull(controller.camera.GlobalTransform.origin, controller.camera.GlobalTransform.basis.GetEuler());
+        WorldManager.instance.shots.Pull(controller.camera.GlobalTransform.origin, controller.camera.GlobalTransform.basis.GetEuler());
     }
 
     public PlayerState GetCurrentState()
@@ -249,6 +257,7 @@ public class PlayerAbility : BaseAttatch
         if (currentState != state)
         {
             currentState = state;
+            stateChange?.Invoke(state);
         }
     }
 }
@@ -270,7 +279,7 @@ public class WallRunningData
 
     public bool Sensed()
     {
-        return RayCastData.SurroundingCasts[ray].colliding && PlayerAreaSensor.area[sensorDirection];
+        return RayCastData.SurroundingCasts[ray].colliding && PlayerAreaSensor.GetArea(sensorDirection);
     }
 }
 

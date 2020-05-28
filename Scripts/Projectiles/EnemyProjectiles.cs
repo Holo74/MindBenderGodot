@@ -1,14 +1,16 @@
 using Godot;
 using System;
 
-//Ignores everything but the player and things not in the layer
-public class PlayerProjectiles : Area
+//Enemy projectiles that are designed to damage the player and everything else in their layer
+public class EnemyProjectiles : Area
 {
     private float time = 0;
     [Export]
     private float speed = 1.2f;
     [Export]
     private float damage = 1;
+    [Export]
+    private DamageType damageType;
     private Vector3 direction;
     public override void _EnterTree()
     {
@@ -23,11 +25,11 @@ public class PlayerProjectiles : Area
 
     public void HitTarget(Node body)
     {
-        if (body.Name == "Player")
+        if (body == this)
             return;
         if (body is Health health)
         {
-            health.TakeDamage(1f, DamageType.basic);
+            health.TakeDamage(1f, damageType);
         }
         Remove();
     }

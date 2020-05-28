@@ -1,6 +1,7 @@
 using Godot;
 using System;
 
+//I was lazy so I made a more complicated solution to have the camera rotate with the mouse, it should work though
 public class Rotation : BaseAttatch
 {
     private bool xRotation, rotationLimit;

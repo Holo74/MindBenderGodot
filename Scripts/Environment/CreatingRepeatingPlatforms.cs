@@ -1,6 +1,7 @@
 using Godot;
 using System;
 
+//I made this because I was lazy and didn't want to create lots of platforms in the debug area
 public class CreatingRepeatingPlatforms : Spatial
 {
     [Export]

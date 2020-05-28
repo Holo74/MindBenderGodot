@@ -1,11 +1,12 @@
 using Godot;
 using System;
 
+//Is the singolton that gets all the inputs for the player to use
 public class InputHandler : Node
 {
     [Signal]
     public delegate void MouseMoved(Vector2 inputting);
-    private bool[] inputs = new bool[20];
+    private bool[] inputs = new bool[12];
     public static InputHandler Instance { get; private set; }
 
     public override void _Ready()
@@ -28,6 +29,7 @@ public class InputHandler : Node
         inputs[(int)Keys.strafe] = Input.IsActionJustPressed("Strafe");
         inputs[(int)Keys.throwing] = Input.IsActionJustPressed("Throwing");
         inputs[(int)Keys.hitting] = Input.IsActionJustPressed("Hit");
+        inputs[(int)Keys.escapeButton] = Input.IsActionJustPressed("Quit");
 
     }
 
@@ -62,5 +64,6 @@ public enum Keys
     throwing,
     hitting,
     gliding,
-    strafe
+    strafe,
+    escapeButton
 }

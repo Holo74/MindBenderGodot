@@ -1,6 +1,7 @@
 using Godot;
 using System;
 
+//Used for the player to crouch
 public class SizeHandler : BaseAttatch
 {
     private Vector3 headMinPos = new Vector3(0, .3f, 0), headMaxPos = new Vector3(0, 1f, 0);

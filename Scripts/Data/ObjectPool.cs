@@ -1,35 +1,35 @@
 using Godot;
-using System.Collections.Generic;
 
+//Mostly a helper tool that is used to store packed scenes and what parent the objects should be with 
 public class ObjectPool<T> where T : Spatial
 {
     PackedScene creator;
-    private int max = 0;
     private Node parent;
-    private Queue<T> queue = new Queue<T>();
-    private string name;
-    public ObjectPool(string name, int amount = 10, Node parent = null)
+    public ObjectPool(string name, Node parent = null)
     {
         creator = ResourceLoader.Load<PackedScene>("res://Resources/SpawnInstances/" + name);
-        max = amount;
-        if (parent == null)
-        {
-            this.parent = GameManager.Instance.Root;
-        }
-        else
+        if (parent != null)
         {
             this.parent = parent;
         }
-        this.name = name;
-        while (queue.Count < amount)
+    }
+
+    public ObjectPool(PackedScene packed, Node parent = null)
+    {
+        creator = packed;
+        if (parent != null)
         {
-            queue.Enqueue((T)creator.Instance());
+            this.parent = parent;
         }
     }
 
     public T Pull()
     {
-        T holder = queue.Dequeue();
+        if (parent == null)
+        {
+            parent = GameManager.Instance.Root;
+        }
+        T holder = (T)creator.Instance();
         GameManager.Instance.Root.AddChild(holder);
         holder.Owner = parent;
         return holder;
@@ -37,25 +37,15 @@ public class ObjectPool<T> where T : Spatial
 
     public T Pull(Vector3 pos, Vector3 rot)
     {
-        T holder;
-        if (queue.Count == 0)
+        if (parent == null)
         {
-            holder = (T)ResourceLoader.Load<PackedScene>("res://Resources/SpawnInstances/" + name).Instance();
+            parent = GameManager.Instance.Root;
         }
-        else
-        {
-            holder = queue.Dequeue();
-        }
+        T holder = (T)creator.Instance();
         holder.Translation = pos;
         holder.Rotation = rot;
         GameManager.Instance.Root.AddChild(holder);
         holder.Owner = parent;
         return holder;
-    }
-
-    public void Push(T thing)
-    {
-        GameManager.Instance.Root.RemoveChild(thing);
-        queue.Enqueue(thing);
     }
 }

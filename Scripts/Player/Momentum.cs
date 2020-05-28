@@ -1,6 +1,7 @@
 using Godot;
 using System;
 
+//It works... don't ask questions on why or how it works because I don't even know anymore
 public class Momentum : BaseAttatch
 {
     public Momentum(PlayerController controller) : base(controller, true) { }
@@ -13,11 +14,15 @@ public class Momentum : BaseAttatch
     private bool moved = false;
     private float NinetyDegreesToRad = Mathf.Deg2Rad(-90);
     private RayInfo groundData { get { return RayCastData.SurroundingCasts[RayDirections.Bottom]; } }
-    private bool groundColliding { get { return PlayerAreaSensor.area[AreaSensorDirection.Bottom]; } }
+    private bool groundColliding { get { return PlayerAreaSensor.GetArea(AreaSensorDirection.Bottom); } }
     private float maxSpeed = 1;
     private float maxAirSpeed = 0;
     private float accelerate = 1f, currentAccelerationTime = 6f;
-
+    protected override void Setup(PlayerController controller, bool needsUpdate)
+    {
+        this.controller = controller;
+        controller.AddToPhysicsUpdate(Update);
+    }
     public Vector3 GetVerticalMove()
     {
         return verticalMove;
@@ -82,7 +87,7 @@ public class Momentum : BaseAttatch
             }
             if (groundData.colliding)
             {
-                controller.MoveAndSlide(groundData.normal.Cross(stableMove.Rotated(Vector3.Up, NinetyDegreesToRad)).Normalized() * currentSpeed * accelerate);
+                controller.MoveAndSlideWithSnap(groundData.normal.Cross(stableMove.Rotated(Vector3.Up, NinetyDegreesToRad)).Normalized() * currentSpeed * accelerate, Vector3.Down);
             }
             else
             {
@@ -229,6 +234,10 @@ public class Momentum : BaseAttatch
     {
         if (state)
         {
+            if (verticalMove.y < -15f)
+            {
+                controller.TakeDamage((Mathf.Pow(verticalMove.y + 15f, 2f)), DamageType.fall);
+            }
             currentSpeed = stableMove.Length() + horizontalAcc.Length();
             horizontalAcc = Vector3.Zero;
             verticalMove = Vector3.Zero;
@@ -242,10 +251,7 @@ public class Momentum : BaseAttatch
                 SetState(PlayerState.standing);
                 Stop();
             }
-            if (verticalMove.y < 1)
-            {
-                controller.TakeDamage(-verticalMove.y, DamageType.environmental);
-            }
+
         }
         else
         {

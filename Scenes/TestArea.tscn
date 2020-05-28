@@ -1,0 +1,15 @@
+[gd_scene format=2]
+
+[node name="Spatial" type="Spatial"]
+
+[node name="CSGCombiner" type="CSGCombiner" parent="."]
+transform = Transform( 10, 0, 0, 0, 10, 0, 0, 0, 10, 0, 0, 0 )
+
+[node name="CSGBox" type="CSGBox" parent="CSGCombiner"]
+
+[node name="CSGBox2" type="CSGBox" parent="CSGCombiner"]
+transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, -0.154333, 0, 0 )
+operation = 2
+width = 1.8
+height = 1.8
+depth = 1.8

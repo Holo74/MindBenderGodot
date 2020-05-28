@@ -1,6 +1,7 @@
 using Godot.Collections;
 using Godot;
 
+///<summary>The central thing that says what upgrades the player currenly has</summary>
 public class PlayerUpgrade
 {
     private Dictionary upgrades = new Dictionary();
@@ -20,9 +21,17 @@ public class PlayerUpgrade
 
     public void SetUpgradeTo(string name, bool data)
     {
-        upgrades[name] = data;
-    }
+        if (upgrades == null)
+        {
+            upgrades.Add(name, data);
+        }
+        else
+        {
+            upgrades[name] = data;
+        }
 
+    }
+    //Used to populate the dictionary without getting an error when the player attempts to get them
     public PlayerUpgrade()
     {
         upgrades.Add(DoubleJump, false);
@@ -42,11 +51,15 @@ public class PlayerUpgrade
 
     public bool GetUpgrade(string name)
     {
+        if (upgrades == null)
+            return false;
         return (bool)upgrades[name];
     }
 
     public float GetWallRunTotalTime()
     {
+        if (upgrades == null)
+            return 0;
         float minTime = PlayerOptions.wallRunStickTime;
         if ((bool)upgrades[WallRunTime01])
         {

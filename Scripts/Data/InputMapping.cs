@@ -1,7 +1,6 @@
 using Godot;
-using System;
-using Godot.Collections;
 
+///<summary>This is used to label buttons with what button is used for a certain action. it should be replaced with something that can change input as well</summary>
 public class InputMapping : Node
 {
     [Export]

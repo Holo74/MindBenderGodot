@@ -1,21 +1,28 @@
 using Godot;
+using Godot.Collections;
 using System;
 
-public class SavingAndLoading : Node
+public class SavingAndLoading
 {
-    // Declare member variables here. Examples:
-    // private int a = 2;
-    // private string b = "text";
+    // public void LoadingData()
+    // {
+    //     File saveData = new File();
+    //     saveData.Open(savePath, File.ModeFlags.Write);
+    //     saveData.StoreLine(JSON.Print(PlayerOptions.Instance.GetData()));
+    //     saveData.StoreLine(JSON.Print(PlayerController.Instance.upgrades.GetAllUpgrades()));
+    //     saveData.Close();
+    // }
 
-    // Called when the node enters the scene tree for the first time.
-    public override void _Ready()
-    {
-        
-    }
-
-//  // Called every frame. 'delta' is the elapsed time since the previous frame.
-//  public override void _Process(float delta)
-//  {
-//      
-//  }
+    // public void LoadingData()
+    // {
+    //     File saveData = new File();
+    //     if (saveData.FileExists(savePath))
+    //     {
+    //         saveData.Open(savePath, File.ModeFlags.Read);
+    //         Dictionary newOptions = (Dictionary)JSON.Parse(saveData.GetLine()).Result;
+    //         playerUpgrades = (Dictionary)JSON.Parse(saveData.GetLine()).Result;
+    //         PlayerOptions.Instance.SetData(newOptions);
+    //     }
+    //     saveData.Close();
+    // }
 }

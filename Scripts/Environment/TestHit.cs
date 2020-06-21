@@ -9,7 +9,7 @@ public class TestHit : HealthStatic
         Init(-1);
     }
 
-    public override bool TakeDamage(float damage, DamageType typing)
+    public override bool TakeDamage(float damage, DamageType typing, Node source)
     {
         InGameMenu.DisplayText("The red cube took " + damage + " damage of type " + typing);
         return true;

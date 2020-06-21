@@ -16,7 +16,8 @@ public class GameManager : Node
     //This is going to be the options menu
     private string savePath = "user://saveData.save";
     public string startingAreaPath;
-
+    public SavedData[] datas = new SavedData[3];
+    public bool SavesLoaded = false;
 
     public override void _Ready()
     {
@@ -27,6 +28,10 @@ public class GameManager : Node
     {
         startingAreaPath = loadArea;
         GetTree().ChangeScene("res://Scenes/WorldManager.tscn");
+        File saveData = new File();
+        saveData.Open(savePath, File.ModeFlags.Write);
+        saveData.StoreLine("Meow");
+        saveData.Close();
     }
 
     //Needs to be checked if in an actual game or can be done on the player as a call
@@ -66,10 +71,8 @@ public class GameManager : Node
         EmitSignal(nameof(ReturnToTitle));
     }
 
-    //Delete The inside and put into a saving game script
     public void QuitGame()
     {
-        //Most of this needs to be put into a save station and not be done when quiting
         GetTree().Quit();
     }
 }

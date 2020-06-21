@@ -89,5 +89,6 @@ public enum AreaSensorDirection
 {
     Left,
     Right,
-    Bottom
+    Bottom,
+    Above
 }

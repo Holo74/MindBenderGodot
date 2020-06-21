@@ -5,10 +5,13 @@ using System;
 public class TitleScreen : Node
 {
 
+    public Node mainNode;
+
     public override void _Ready()
     {
-        GetChild(0).Connect("pressed", this, nameof(PlayNewGame));
-        GetChild(1).Connect("pressed", this, nameof(GoToDebug));
+        mainNode = GetChild(0);
+        mainNode.GetChild(0).Connect("pressed", this, nameof(PlayNewGame));
+        mainNode.GetChild(1).Connect("pressed", this, nameof(GoToDebug));
     }
 
     public void PlayNewGame()
@@ -19,5 +22,10 @@ public class TitleScreen : Node
     public void GoToDebug()
     {
         GameManager.Instance.StartGame();
+    }
+
+    public void MakeMainMenu(Node parent)
+    {
+
     }
 }

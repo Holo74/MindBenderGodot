@@ -1,0 +1,2 @@
+﻿37931
+/home/holo74/Desktop/Godot_v3.2.1-stable_mono_x11_64/Godot_v3.2.1-stable_mono_x11.64

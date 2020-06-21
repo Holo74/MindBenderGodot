@@ -18,13 +18,17 @@ public class WorldManager : Node
     public delegate void AreaLoaded();
     private AreaLoaded loadingDone;
     private Vector3 lastSaveLoc;
+    //Do not rely on this telling you what room the player is actually in.  This is just to know what rooms are loaded and not to say which rooms the player is in
+    private Node previousRoom, currentRoom, playerInRoom;
+    private string previousRoomFile, currentRoomFile;
     public override void _Ready()
     {
         instance = this;
         loadingBar = GetChild(0).GetChild<ProgressBar>(1);
         loadingPaths.Enqueue("res://Scenes/Player.tscn");
-        loadingPaths.Enqueue(GameManager.Instance.startingAreaPath);
         loadingPaths.Enqueue("res://Scenes/InGameMenu.tscn");
+        loadingPaths.Enqueue(GameManager.Instance.startingAreaPath);
+        currentRoomFile = GameManager.Instance.startingAreaPath;
         waitFrame = 1;
         loader = ResourceLoader.LoadInteractive(loadingPaths.Dequeue());
         shots = new ObjectPool<PlayerProjectiles>("TempProjectile.tscn");
@@ -44,9 +48,10 @@ public class WorldManager : Node
                 if (GetTree().HasGroup("RespawnLocation"))
                     spawn = (Spatial)GetTree().GetNodesInGroup("RespawnLocation")[0];
                 PlayerController.Instance.ReadyPlayer(spawn.GlobalTransform.origin, spawn.Rotation);
-                GameManager.Instance.SetToPlay();
                 PlayerController.Instance.UpdateCharacterSettings();
                 RemoveChild(GetChild(0));
+                InGameMenu.Instance.ReadyMenu();
+                GameManager.Instance.SetToPlay();
             }
             return;
         }
@@ -56,16 +61,15 @@ public class WorldManager : Node
             switch (error)
             {
                 case Error.FileEof:
-                    GD.Print("Loaded");
                     PackedScene holder = loader.GetResource().Duplicate() as PackedScene;
                     loader.Dispose();
                     Node node = holder.Instance();
-
                     loader = null;
                     AddChild(node);
                     if (loadingPaths.Count == 0)
                     {
-                        GD.Print("Done");
+                        currentRoom = node;
+                        playerInRoom = node;
                         loadingBar.Value = 100;
                         waitFrame = 10f;
                     }
@@ -101,6 +105,20 @@ public class WorldManager : Node
                     EmitSignal(nameof(AreaLoaded));
                     loadingDone?.Invoke();
                     loadingDone = null;
+                    if (previousRoom != null)
+                    {
+                        if (previousRoom == playerInRoom)
+                        {
+                            previousRoom.QueueFree();
+                            previousRoom = currentRoom;
+                            previousRoomFile = currentRoomFile;
+                        }
+                        else
+                        {
+                            currentRoom.QueueFree();
+                        }
+                    }
+                    currentRoom = node;
                     break;
                 case Error.Ok:
                     break;
@@ -113,13 +131,18 @@ public class WorldManager : Node
 
     public void LoadArea(string path, Vector3 loc, Vector3 rot)
     {
+        if (currentRoomFile == path || previousRoomFile == path)
+            return;
         loader = ResourceLoader.LoadInteractive(path);
         loadLocation = loc;
         loadRotation = rot;
+        currentRoomFile = path;
     }
 
     public void LoadArea(string path, Vector3 loc, Vector3 rot, AreaLoaded load)
     {
+        if (currentRoomFile == path || previousRoomFile == path)
+            return;
         loadingDone += load;
         LoadArea(path, loc, rot);
     }

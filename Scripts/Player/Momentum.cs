@@ -18,6 +18,10 @@ public class Momentum : BaseAttatch
     private float maxSpeed = 1;
     private float maxAirSpeed = 0;
     private float accelerate = 1f, currentAccelerationTime = 6f;
+    private bool jumpRequest = false;
+    private float jumpTimer, jumpStrRequest;
+    public delegate void JumpRequest();
+    private JumpRequest JumpAccepted;
     protected override void Setup(PlayerController controller, bool needsUpdate)
     {
         this.controller = controller;
@@ -55,7 +59,10 @@ public class Momentum : BaseAttatch
                 }
                 if (controller.ability.GetCurrentState() != PlayerState.slide)
                 {
-                    currentSpeed -= currentSpeed * time * PlayerOptions.walkingDeceleration;
+                    if (currentSpeed < .1f)
+                        currentSpeed = 0;
+                    else
+                        currentSpeed -= currentSpeed * time * PlayerOptions.walkingDeceleration;
                 }
             }
             else
@@ -122,6 +129,29 @@ public class Momentum : BaseAttatch
                     break;
             }
         }
+        if (jumpRequest && jumpTimer < .3f)
+        {
+            jumpTimer += time;
+            if (!PlayerAreaSensor.GetArea(AreaSensorDirection.Above))
+            {
+                switch (controller.ability.GetCurrentState())
+                {
+                    case PlayerState.fallingDown:
+                    case PlayerState.fallingUp:
+                    case PlayerState.glide:
+                        if (controller.ability.CanJump())
+                        {
+                            JumpFinished();
+                        }
+                        break;
+                    default:
+                        JumpFinished();
+                        break;
+                }
+            }
+        }
+        if (PlayerAreaSensor.GetArea(AreaSensorDirection.Above) && verticalMove.y > 0)
+            verticalMove = Vector3.Zero;
         controller.MoveAndSlide(verticalMove);
         controller.MoveAndSlide(horizontalAcc);
         controller.MoveAndSlide(pushing);
@@ -136,6 +166,14 @@ public class Momentum : BaseAttatch
         pushing = Vector3.Zero;
         if (controller.ability.GetCurrentState() != PlayerState.slide)
             moved = false;
+    }
+
+    private void JumpFinished()
+    {
+        verticalMove = Vector3.Up * jumpStrRequest;
+        jumpRequest = false;
+        SetState(PlayerState.fallingUp);
+        JumpAccepted();
     }
 
     public void GroundMovement(Vector3 direction, float maxSpeed, float acceleration)
@@ -212,10 +250,12 @@ public class Momentum : BaseAttatch
         return horizontalAcc.Length();
     }
 
-    public void VerticalIncrease(float amount)
+    public void VerticalIncrease(float amount, JumpRequest function)
     {
-        SetState(PlayerState.fallingUp);
-        verticalMove = Vector3.Up * amount;
+        jumpRequest = true;
+        jumpStrRequest = amount;
+        jumpTimer = 0;
+        JumpAccepted = function;
     }
 
     public void ChangeStableVectorDirection(Vector3 direction)
@@ -236,7 +276,7 @@ public class Momentum : BaseAttatch
         {
             if (verticalMove.y < -15f)
             {
-                controller.TakeDamage((Mathf.Pow(verticalMove.y + 15f, 2f)), DamageType.fall);
+                controller.TakeDamage((Mathf.Pow(verticalMove.y + 15f, 2f)), DamageType.fall, null);
             }
             currentSpeed = stableMove.Length() + horizontalAcc.Length();
             horizontalAcc = Vector3.Zero;

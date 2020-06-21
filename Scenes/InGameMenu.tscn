@@ -21,6 +21,7 @@ pathToQuit = NodePath("OptionsMenu/Quit")
 pathToHealthConatiner = NodePath("PlayerHud/Health")
 
 [node name="PlayerHud" type="Control" parent="InGameMenuAndHud"]
+visible = false
 anchor_right = 1.0
 anchor_bottom = 1.0
 __meta__ = {

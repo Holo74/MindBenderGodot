@@ -4,7 +4,9 @@ using System;
 //Ignores everything but the player and things not in the layer
 public class PlayerProjectiles : Area
 {
-    private float time = 0;
+    [Export]
+    private float MaxTime = 2;
+    private float time = 1;
     [Export]
     private float speed = 1.2f;
     [Export]
@@ -12,7 +14,7 @@ public class PlayerProjectiles : Area
     private Vector3 direction;
     public override void _EnterTree()
     {
-        time = 0;
+        time = MaxTime;
         direction -= Transform.basis.z;
     }
 
@@ -27,21 +29,25 @@ public class PlayerProjectiles : Area
             return;
         if (body is Health health)
         {
-            health.TakeDamage(1f, DamageType.basic);
+            health.TakeDamage(1f, DamageType.basic, this);
         }
-        Remove();
+        else
+        {
+            Remove();
+        }
+
     }
 
-    private void Remove()
+    public void Remove()
     {
         QueueFree();
     }
 
     public override void _Process(float delta)
     {
-        time += delta;
-        Translation += direction * delta * speed;
-        if (time > 5)
+        time -= delta;
+        Translation += direction.Normalized() * delta * speed;
+        if (time < 0)
         {
             Remove();
         }

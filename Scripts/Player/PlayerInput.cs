@@ -54,6 +54,34 @@ public class PlayerInput : BaseAttatch
         {
             controller.ability.Throw();
         }
+        if (input.GetInput(Keys.weapon1))
+        {
+            controller.ability.SwapWeapon(CurrentWeaponEquiped.first);
+        }
+        if (input.GetInput(Keys.weapon2))
+        {
+            controller.ability.SwapWeapon(CurrentWeaponEquiped.second);
+        }
+        if (input.GetInput(Keys.weapon3))
+        {
+            controller.ability.SwapWeapon(CurrentWeaponEquiped.third);
+        }
+        if (input.GetInput(Keys.weapon4))
+        {
+            controller.ability.SwapWeapon(CurrentWeaponEquiped.fourth);
+        }
+        if (input.GetInput(Keys.hostler))
+        {
+            controller.ability.SwapWeapon(CurrentWeaponEquiped.none);
+        }
+        if (input.GetInput(Keys.cycleUp))
+        {
+            controller.ability.SwapWeapon(true);
+        }
+        if (input.GetInput(Keys.cycleDown))
+        {
+            controller.ability.SwapWeapon(false);
+        }
     }
 
     private bool SprintOutput()

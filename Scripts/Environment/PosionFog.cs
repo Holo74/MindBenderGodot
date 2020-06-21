@@ -19,7 +19,7 @@ public class PosionFog : Area
     {
         if (player != null)
         {
-            player.TakeDamage(damageAmount, damageType);
+            player.TakeDamage(damageAmount * delta, damageType, null);
         }
     }
 

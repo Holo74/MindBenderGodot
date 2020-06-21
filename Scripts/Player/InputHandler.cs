@@ -6,7 +6,7 @@ public class InputHandler : Node
 {
     [Signal]
     public delegate void MouseMoved(Vector2 inputting);
-    private bool[] inputs = new bool[12];
+    private bool[] inputs = new bool[19];
     public static InputHandler Instance { get; private set; }
 
     public override void _Ready()
@@ -30,6 +30,13 @@ public class InputHandler : Node
         inputs[(int)Keys.throwing] = Input.IsActionJustPressed("Throwing");
         inputs[(int)Keys.hitting] = Input.IsActionJustPressed("Hit");
         inputs[(int)Keys.escapeButton] = Input.IsActionJustPressed("Quit");
+        inputs[(int)Keys.weapon1] = Input.IsActionJustPressed("Weapon1");
+        inputs[(int)Keys.weapon2] = Input.IsActionJustPressed("Weapon2");
+        inputs[(int)Keys.weapon3] = Input.IsActionJustPressed("Weapon3");
+        inputs[(int)Keys.weapon4] = Input.IsActionJustPressed("Weapon4");
+        inputs[(int)Keys.hostler] = Input.IsActionJustPressed("Holster");
+        inputs[(int)Keys.cycleUp] = Input.IsActionJustPressed("CycleWeaponUp");
+        inputs[(int)Keys.cycleDown] = Input.IsActionJustPressed("CycleWeaponDown");
 
     }
 
@@ -65,5 +72,12 @@ public enum Keys
     hitting,
     gliding,
     strafe,
-    escapeButton
+    escapeButton,
+    weapon1,
+    weapon2,
+    weapon3,
+    weapon4,
+    hostler,
+    cycleUp,
+    cycleDown
 }

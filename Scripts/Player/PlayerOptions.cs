@@ -6,7 +6,6 @@ using Godot.Collections;
 public class PlayerOptions : Node
 {
     public static PlayerOptions Instance { get; private set; }
-    //I need to put these in to the settings area which will be in the game manager
 
     public const float playerWalkingSpeed = 10f;
     public const float playerMaxWalkingSpeed = 3.5f;

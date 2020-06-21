@@ -15,15 +15,22 @@ public class PlayerController : HealthKinematic
     public PlayerAbility ability { get; private set; }
     public PlayerInput inputs { get; private set; }
     public CameraRotHandler camRot { get; private set; }
+    public PlayerSoundControl soundControl { get; private set; }
     public PlayerUpgrade upgrades = new PlayerUpgrade();
     public Camera camera;
     [Export]
     private NodePath headPath, headRotationPath, cameraPath;
     [Signal]
     public delegate void TakingDamage();
+    public delegate void Died();
+    private Died death;
     public static PlayerController Instance { get; private set; }
-
+    public delegate void PlayerDamaged(float amount, DamageType type, EnemyProjectiles projectile);
+    private PlayerDamaged playerTookDamage;
     private bool characterReady = false;
+    public AudioStreamPlayer playerSound { private set; get; }
+    public AnimationTree animationNode { private set; get; }
+    public PlayerAnimationController animationController { private set; get; }
 
     public void ReadyPlayer(Vector3 spawn, Vector3 rotation)
     {
@@ -38,16 +45,19 @@ public class PlayerController : HealthKinematic
         options = PlayerOptions.Instance;
         headRotation = new Rotation(this, true, GetChild<Spatial>(2).GetChild<Spatial>(0), true, -80, 85);
         camera = GetChild<Spatial>(2).GetChild<Spatial>(0).GetChild<Camera>(0);
+        playerSound = GetChild<AudioStreamPlayer>(5);
+        animationNode = GetChild<AnimationTree>(7);
         bodyRotation = new Rotation(this, false, this);
         InputHandler.Instance.ConnectToMouseMovement(this, nameof(Rotating));
         playMovement = new Momentum(this);
         size = new SizeHandler(this, GetChild<Spatial>(2));
-
         PlayerAreaSensor.GetPlayerSensor(AreaSensorDirection.Bottom).RegisterStateChange(this, nameof(GroundChanging));
         ability = new PlayerAbility(this);
         inputs = new PlayerInput(this);
         camRot = new CameraRotHandler(this);
-        Init(100);
+        soundControl = new PlayerSoundControl(this);
+        animationController = new PlayerAnimationController(this);
+        Init(10);
     }
 
     public void UpdateCharacterSettings()
@@ -58,13 +68,19 @@ public class PlayerController : HealthKinematic
     public override void _Process(float delta)
     {
         if (GameManager.Instance.playing && characterReady)
-            update?.Invoke(delta);
+        {
+            if (!IsDead())
+            {
+                update?.Invoke(delta);
+            }
+        }
     }
 
     public override void _PhysicsProcess(float delta)
     {
         if (GameManager.Instance.playing && characterReady)
-            physicsUpdate?.Invoke(delta);
+            if (!IsDead())
+                physicsUpdate?.Invoke(delta);
     }
 
     public static bool CharacterPlaying()
@@ -87,7 +103,9 @@ public class PlayerController : HealthKinematic
     public void Rotating(Vector2 vec)
     {
         if (inputs != null)
-            inputs.Rotating(vec);
+            if (GameManager.Instance.playing && characterReady)
+                if (!IsDead())
+                    inputs.Rotating(vec);
     }
 
     public void GroundChanging(bool state)
@@ -96,12 +114,40 @@ public class PlayerController : HealthKinematic
         playMovement.LandingSignal(state);
     }
 
-    public override bool TakeDamage(float damage, DamageType typing)
+    public override bool TakeDamage(float damage, DamageType typing, Node source)
     {
+        if (IsDead())
+        {
+            return false;
+        }
+        if (source != null)
+        {
+            if (source is EnemyProjectiles projectiles)
+            {
+                playerTookDamage?.Invoke(damage, typing, projectiles);
+                projectiles.Remove();
+            }
+        }
         Damaged(damage);
-        EmitSignal(nameof(TakingDamage), GetHealth());
-        GD.Print(GetHealth());
+        if (IsDead())
+        {
+            death?.Invoke();
+        }
+        else
+        {
+            EmitSignal(nameof(TakingDamage), GetHealth());
+        }
         return true;
+    }
+
+    public void AttachToDeath(Died d)
+    {
+        death += d;
+    }
+
+    public void PlayerTookDamageAdding(PlayerDamaged registered)
+    {
+        playerTookDamage += registered;
     }
 
     public void DeloadPlayer()

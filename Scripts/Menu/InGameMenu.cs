@@ -69,4 +69,9 @@ public class InGameMenu : Control
     {
         healthBar.Value = (newValue - 1) % 100;
     }
+
+    public void ReadyMenu()
+    {
+        hud.Visible = true;
+    }
 }

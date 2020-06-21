@@ -25,16 +25,17 @@ public class EnemyProjectiles : Area
 
     public void HitTarget(Node body)
     {
-        if (body == this)
-            return;
         if (body is Health health)
         {
-            health.TakeDamage(1f, damageType);
+            health.TakeDamage(1f, damageType, this);
         }
-        Remove();
+        else
+        {
+            Remove();
+        }
     }
 
-    private void Remove()
+    public void Remove()
     {
         QueueFree();
     }

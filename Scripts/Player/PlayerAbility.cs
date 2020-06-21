@@ -4,8 +4,13 @@ using System;
 //This controls how the abilities work and to process all the filtered inputs
 public class PlayerAbility : BaseAttatch
 {
+    //Needs to be update with the actual weapons
     public PlayerAbility(PlayerController controller) : base(controller, true)
     {
+        weapons[0] = new FirstWeapon();
+        weapons[1] = new FirstWeapon();
+        weapons[2] = new FirstWeapon();
+        weapons[3] = new FirstWeapon();
     }
 
     public bool DoubleJumpUsed = false, tripleJumpUsed = false;
@@ -19,6 +24,9 @@ public class PlayerAbility : BaseAttatch
     private float currentWallRunTime = 0f;
     public delegate void StateChange(PlayerState state);
     private StateChange stateChange;
+    private Vector3 strafeDirectionRequest;
+    private CurrentWeaponEquiped weapon = CurrentWeaponEquiped.none;
+    private WeaponBase[] weapons = new WeaponBase[4];
 
     public void AddToStateChange(StateChange function)
     {
@@ -44,6 +52,10 @@ public class PlayerAbility : BaseAttatch
             }
         }
         glideLock = false;
+        weapons[0].UpdateGun(delta);
+        weapons[1].UpdateGun(delta);
+        weapons[2].UpdateGun(delta);
+        weapons[3].UpdateGun(delta);
     }
 
     public void Move(Vector3 direction, bool sprint, bool wallRun = false)
@@ -107,11 +119,16 @@ public class PlayerAbility : BaseAttatch
             case PlayerState.empty:
                 if (controller.upgrades.GetUpgrade(PlayerUpgrade.StrafeJump) && controller.playMovement.GetCurrentSpeed() < controller.playMovement.GetMaxSpeed() + 1f)
                 {
-                    controller.playMovement.VerticalIncrease(PlayerOptions.playerStrafeStrengthVer);
-                    controller.playMovement.HorizontalAccelerationSet(direction * PlayerOptions.playerStrafeStrengthHor);
+                    controller.playMovement.VerticalIncrease(PlayerOptions.playerStrafeStrengthVer, StrafeJumpUsed);
+                    strafeDirectionRequest = direction;
                 }
                 break;
         }
+    }
+
+    private void StrafeJumpUsed()
+    {
+        controller.playMovement.HorizontalAccelerationSet(strafeDirectionRequest * PlayerOptions.playerStrafeStrengthHor);
     }
 
     private bool WallRun(bool continuing)
@@ -165,40 +182,62 @@ public class PlayerAbility : BaseAttatch
             case PlayerState.sprinting:
             case PlayerState.walking:
             case PlayerState.crouch:
-                cayoteTime = PlayerOptions.cayoteMaxTime;
-                controller.playMovement.VerticalIncrease(PlayerOptions.jumpStr);
-                if (controller.size.crouched)
-                    controller.size.Crouch();
+                controller.playMovement.VerticalIncrease(PlayerOptions.jumpStr, RegularJumpUsed);
                 break;
             case PlayerState.wallRunning:
-                controller.playMovement.VerticalIncrease(PlayerOptions.wallJumpVerStr);
-                controller.playMovement.HorizontalAccelerationSet(PlayerOptions.wallJumpHorStr * attachedTo.Normals());
-                ResetJumps();
+                controller.playMovement.VerticalIncrease(PlayerOptions.wallJumpVerStr, WallRunningJumpUsed);
                 break;
             case PlayerState.fallingUp:
             case PlayerState.fallingDown:
                 if (cayoteTime < PlayerOptions.cayoteMaxTime)
                 {
-                    cayoteTime = PlayerOptions.cayoteMaxTime;
-                    controller.playMovement.VerticalIncrease(PlayerOptions.jumpStr);
+                    controller.playMovement.VerticalIncrease(PlayerOptions.jumpStr, FallingJump);
                     return;
                 }
                 if (controller.upgrades.GetUpgrade(PlayerUpgrade.DoubleJump) && !DoubleJumpUsed)
                 {
-                    DoubleJumpUsed = true;
-                    controller.playMovement.VerticalIncrease(PlayerOptions.doubleJumpStr);
+                    controller.playMovement.VerticalIncrease(PlayerOptions.doubleJumpStr, UsedDoubleJump);
                     return;
                 }
                 if (controller.upgrades.GetUpgrade(PlayerUpgrade.TripleJump) && !tripleJumpUsed)
                 {
-                    tripleJumpUsed = true;
-                    controller.playMovement.VerticalIncrease(PlayerOptions.tripleJumpStr);
+                    controller.playMovement.VerticalIncrease(PlayerOptions.tripleJumpStr, UsedTripleJump);
                     return;
                 }
+                controller.playMovement.VerticalIncrease(PlayerOptions.jumpStr, RegularJumpUsed);
                 break;
             default:
                 break;
         }
+    }
+
+    private void RegularJumpUsed()
+    {
+        cayoteTime = PlayerOptions.cayoteMaxTime;
+        if (controller.size.crouched)
+            controller.size.Crouch();
+    }
+
+    private void WallRunningJumpUsed()
+    {
+        if (RunningOnRightWall || left.Sensed())
+            controller.playMovement.HorizontalAccelerationSet(PlayerOptions.wallJumpHorStr * attachedTo.Normals());
+        ResetJumps();
+    }
+
+    private void FallingJump()
+    {
+        cayoteTime = PlayerOptions.cayoteMaxTime;
+    }
+
+    private void UsedDoubleJump()
+    {
+        DoubleJumpUsed = true;
+    }
+
+    private void UsedTripleJump()
+    {
+        tripleJumpUsed = true;
     }
 
     private void ResetJumps()
@@ -242,10 +281,124 @@ public class PlayerAbility : BaseAttatch
 
     public void Throw()
     {
-        //Need to reposition where the thing is thrown from and need to make it ignore the player.  
-        //Along with having the cross hair change the size that it is depending on the distance you are from a target
-        //Angle the object to the thing you are looking at
-        WorldManager.instance.shots.Pull(controller.camera.GlobalTransform.origin, controller.camera.GlobalTransform.basis.GetEuler());
+        //Program in a way to swap weapons or to hostler a weapon
+        switch (weapon)
+        {
+            case CurrentWeaponEquiped.first:
+                if (controller.upgrades.GetUpgrade(PlayerUpgrade.FirstWeapon))
+                    weapons[0].FireGun(controller.camera.GlobalTransform.origin, controller.camera.GlobalTransform.basis.GetEuler());
+                break;
+            case CurrentWeaponEquiped.second:
+                break;
+            case CurrentWeaponEquiped.third:
+                break;
+            case CurrentWeaponEquiped.fourth:
+                break;
+            case CurrentWeaponEquiped.none:
+                break;
+        }
+    }
+
+    public void SwapWeapon(CurrentWeaponEquiped request)
+    {
+        string requested = "";
+        switch (request)
+        {
+            case CurrentWeaponEquiped.first:
+                requested = PlayerUpgrade.FirstWeapon;
+                break;
+            case CurrentWeaponEquiped.second:
+                requested = PlayerUpgrade.SecondWeapon;
+                break;
+            case CurrentWeaponEquiped.third:
+                requested = PlayerUpgrade.ThirdWeapon;
+                break;
+            case CurrentWeaponEquiped.fourth:
+                requested = PlayerUpgrade.FourthWeapon;
+                break;
+            case CurrentWeaponEquiped.none:
+                WeaponSwapped(CurrentWeaponEquiped.none);
+                return;
+        }
+        if (controller.upgrades.GetUpgrade(requested))
+            WeaponSwapped(request);
+    }
+
+    //Used for the scroll wheel switching
+    public void SwapWeapon(bool forward)
+    {
+        if (forward)
+        {
+            switch (weapon)
+            {
+                case CurrentWeaponEquiped.none:
+                    if (controller.upgrades.GetUpgrade(PlayerUpgrade.FirstWeapon))
+                        WeaponSwapped(CurrentWeaponEquiped.first);
+                    else
+                        goto case CurrentWeaponEquiped.first;
+                    break;
+                case CurrentWeaponEquiped.first:
+                    if (controller.upgrades.GetUpgrade(PlayerUpgrade.SecondWeapon))
+                        WeaponSwapped(CurrentWeaponEquiped.second);
+                    else
+                        goto case CurrentWeaponEquiped.second;
+                    break;
+                case CurrentWeaponEquiped.second:
+                    if (controller.upgrades.GetUpgrade(PlayerUpgrade.ThirdWeapon))
+                        WeaponSwapped(CurrentWeaponEquiped.third);
+                    else
+                        goto case CurrentWeaponEquiped.third;
+                    break;
+                case CurrentWeaponEquiped.third:
+                    if (controller.upgrades.GetUpgrade(PlayerUpgrade.FourthWeapon))
+                        WeaponSwapped(CurrentWeaponEquiped.fourth);
+                    else
+                        goto case CurrentWeaponEquiped.fourth;
+                    break;
+                case CurrentWeaponEquiped.fourth:
+                    WeaponSwapped(CurrentWeaponEquiped.none);
+                    break;
+            }
+        }
+        else
+        {
+            switch (weapon)
+            {
+                case CurrentWeaponEquiped.none:
+                    if (controller.upgrades.GetUpgrade(PlayerUpgrade.FourthWeapon))
+                        WeaponSwapped(CurrentWeaponEquiped.fourth);
+                    else
+                        goto case CurrentWeaponEquiped.fourth;
+                    break;
+                case CurrentWeaponEquiped.first:
+                    WeaponSwapped(CurrentWeaponEquiped.none);
+                    break;
+                case CurrentWeaponEquiped.second:
+                    if (controller.upgrades.GetUpgrade(PlayerUpgrade.FirstWeapon))
+                        WeaponSwapped(CurrentWeaponEquiped.first);
+                    else
+                        goto case CurrentWeaponEquiped.first;
+                    break;
+                case CurrentWeaponEquiped.third:
+                    if (controller.upgrades.GetUpgrade(PlayerUpgrade.SecondWeapon))
+                        WeaponSwapped(CurrentWeaponEquiped.second);
+                    else
+                        goto case CurrentWeaponEquiped.second;
+                    break;
+                case CurrentWeaponEquiped.fourth:
+                    if (controller.upgrades.GetUpgrade(PlayerUpgrade.ThirdWeapon))
+                        WeaponSwapped(CurrentWeaponEquiped.third);
+                    else
+                        goto case CurrentWeaponEquiped.third;
+                    break;
+            }
+        }
+    }
+
+    public void WeaponSwapped(CurrentWeaponEquiped newWeapon)
+    {
+        GD.Print("Weapon swapped to " + newWeapon);
+        weapon = newWeapon;
     }
 
     public PlayerState GetCurrentState()
@@ -259,6 +412,11 @@ public class PlayerAbility : BaseAttatch
             currentState = state;
             stateChange?.Invoke(state);
         }
+    }
+
+    public bool CanJump()
+    {
+        return (controller.upgrades.GetUpgrade(PlayerUpgrade.DoubleJump) && !DoubleJumpUsed) || (controller.upgrades.GetUpgrade(PlayerUpgrade.TripleJump) && !tripleJumpUsed);
     }
 }
 
@@ -281,6 +439,15 @@ public class WallRunningData
     {
         return RayCastData.SurroundingCasts[ray].colliding && PlayerAreaSensor.GetArea(sensorDirection);
     }
+}
+
+public enum CurrentWeaponEquiped
+{
+    first,
+    second,
+    third,
+    fourth,
+    none
 }
 
 public enum PlayerState

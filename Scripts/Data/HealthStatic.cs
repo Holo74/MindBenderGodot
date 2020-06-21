@@ -28,7 +28,7 @@ public abstract class HealthStatic : StaticBody, Health
             GD.Print("Health has not been initiated just yet on " + Name);
         return health;
     }
-    public virtual bool TakeDamage(float damage, DamageType typing)
+    public virtual bool TakeDamage(float damage, DamageType typing, Node source)
     {
         if (master != null)
         {

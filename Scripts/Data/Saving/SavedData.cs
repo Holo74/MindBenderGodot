@@ -4,15 +4,19 @@ using Godot.Collections;
 public class SavedData
 {
     public static string SavedAreaPath = "SavedAreaPath";
+    public static string SavedGameName = "SavedGameName";
     public SavedData()
     {
+        SavedInPath = new Dictionary();
         upgrades = new PlayerUpgrade();
         SavedInPath.Add(SavedAreaPath, "res://Scenes/Start.tscn");
+        SavedInPath.Add(SavedGameName, "New Game");
     }
     public SavedData(Dictionary playerUpgrades, Dictionary additionalInfo)
     {
         upgrades = new PlayerUpgrade(playerUpgrades);
         SavedInPath = additionalInfo;
+
     }
 
     public PlayerUpgrade upgrades;

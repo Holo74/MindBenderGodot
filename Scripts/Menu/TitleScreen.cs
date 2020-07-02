@@ -1,31 +1,30 @@
 using Godot;
-using System;
+using Godot.Collections;
+using System.Collections.Generic;
 
 //The title screen that currently needs the options menu and loading menu and other fancy stuff
-public class TitleScreen : Node
+public class TitleScreen : MenuBase
 {
-
-    public Node mainNode;
+    private bool dataLoaded = false;
 
     public override void _Ready()
     {
-        mainNode = GetChild(0);
-        mainNode.GetChild(0).Connect("pressed", this, nameof(PlayNewGame));
-        mainNode.GetChild(1).Connect("pressed", this, nameof(GoToDebug));
+        GameManager.Instance.currentMenu = this;
+        mainNode = GetChild<Control>(0);
+        int count = GetChildCount();
+        for (int i = 1; i < count; i++)
+        {
+            GetChild<Control>(i).Visible = false;
+        }
     }
 
-    public void PlayNewGame()
+    public void PlayGame(int save)
     {
-        GameManager.Instance.StartGame("res://Scenes/Start.tscn");
+        GameManager.Instance.StartGame(save);
     }
 
     public void GoToDebug()
     {
         GameManager.Instance.StartGame();
-    }
-
-    public void MakeMainMenu(Node parent)
-    {
-
     }
 }

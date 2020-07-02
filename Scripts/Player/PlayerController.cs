@@ -57,12 +57,14 @@ public class PlayerController : HealthKinematic
         camRot = new CameraRotHandler(this);
         soundControl = new PlayerSoundControl(this);
         animationController = new PlayerAnimationController(this);
-        Init(10);
+        Init(100);
+        SettingsOptions.RegisterUpdatedEvent(UpdateCharacterSettings);
+        upgrades.LoadUpgrades(GameManager.Instance.GetDataUsed().upgrades.GetAllUpgrades());
     }
 
     public void UpdateCharacterSettings()
     {
-        camera.Fov = SettingsOptions.cameraFOV;
+        camera.Fov = SettingsOptions.GetSetting<float>(SettingsNames.cameraFOV);
     }
 
     public override void _Process(float delta)
@@ -153,5 +155,6 @@ public class PlayerController : HealthKinematic
     public void DeloadPlayer()
     {
         Instance = null;
+        SettingsOptions.DeRegisterEvent(UpdateCharacterSettings);
     }
 }

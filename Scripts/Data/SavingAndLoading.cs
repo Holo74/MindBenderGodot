@@ -4,7 +4,7 @@ using System;
 
 public class SavingAndLoading
 {
-    public void SavingOptionData(string savePath)
+    public static void SavingOptionData(string savePath)
     {
         File saveData = new File();
         saveData.Open(savePath, File.ModeFlags.Write);
@@ -12,7 +12,7 @@ public class SavingAndLoading
         saveData.Close();
     }
 
-    public void LoadingOptionsSaveData(string savePath)
+    public static void LoadingOptionsSaveData(string savePath)
     {
         File saveData = new File();
         if (saveData.FileExists(savePath))
@@ -24,7 +24,7 @@ public class SavingAndLoading
         saveData.Close();
     }
 
-    public void SavingGameData(string savePath, Dictionary playerUpgrades, Dictionary additionalInfo)
+    public static void SavingGameData(string savePath, Dictionary playerUpgrades, Dictionary additionalInfo)
     {
         File saveData = new File();
         saveData.Open(savePath, File.ModeFlags.Write);
@@ -33,7 +33,7 @@ public class SavingAndLoading
         saveData.Close();
     }
 
-    public SavedData LoadingGameSaveData(string savePath)
+    public static SavedData LoadingGameSaveData(string savePath)
     {
         File saveData = new File();
         SavedData returning;

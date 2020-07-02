@@ -1,21 +1,25 @@
 using Godot;
 using System;
 
-public class SaveStation : Node
+public class SaveStation : Spatial
 {
-    // Declare member variables here. Examples:
-    // private int a = 2;
-    // private string b = "text";
-
-    // Called when the node enters the scene tree for the first time.
     public override void _Ready()
     {
-        
+        GetChild(0).Connect("body_entered", this, nameof(SaveGame));
     }
 
-//  // Called every frame. 'delta' is the elapsed time since the previous frame.
-//  public override void _Process(float delta)
-//  {
-//      
-//  }
+    public void SaveGame(Node body)
+    {
+        if (body is PlayerController player)
+        {
+            if (!GameManager.Instance.playing)
+                return;
+            player.Translation = GlobalTransform.origin;
+            player.Rotation = GlobalTransform.basis.GetEuler();
+            player.headRotation.LookForward(player.Rotation);
+            player.playMovement.Stop();
+            InGameMenu.Instance.SaveRequest();
+        }
+
+    }
 }

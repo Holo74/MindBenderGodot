@@ -17,13 +17,13 @@ public class WorldManager : Node
     [Signal]
     public delegate void AreaLoaded();
     private AreaLoaded loadingDone;
-    private Vector3 lastSaveLoc;
-    //Do not rely on this telling you what room the player is actually in.  This is just to know what rooms are loaded and not to say which rooms the player is in
-    private Node previousRoom, currentRoom, playerInRoom;
-    private string previousRoomFile, currentRoomFile;
+    private Node previousRoom, currentRoom, nextRoom;
+    private string previousRoomFile, currentRoomFile, nextRoomFile;
+    private Godot.Collections.Dictionary additionalWorldInfo;
     public override void _Ready()
     {
         instance = this;
+        additionalWorldInfo = GameManager.Instance.GetDataUsed().SavedInPath;
         loadingBar = GetChild(0).GetChild<ProgressBar>(1);
         loadingPaths.Enqueue("res://Scenes/Player.tscn");
         loadingPaths.Enqueue("res://Scenes/InGameMenu.tscn");
@@ -69,7 +69,6 @@ public class WorldManager : Node
                     if (loadingPaths.Count == 0)
                     {
                         currentRoom = node;
-                        playerInRoom = node;
                         loadingBar.Value = 100;
                         waitFrame = 10f;
                     }
@@ -105,20 +104,7 @@ public class WorldManager : Node
                     EmitSignal(nameof(AreaLoaded));
                     loadingDone?.Invoke();
                     loadingDone = null;
-                    if (previousRoom != null)
-                    {
-                        if (previousRoom == playerInRoom)
-                        {
-                            previousRoom.QueueFree();
-                            previousRoom = currentRoom;
-                            previousRoomFile = currentRoomFile;
-                        }
-                        else
-                        {
-                            currentRoom.QueueFree();
-                        }
-                    }
-                    currentRoom = node;
+                    nextRoom = node;
                     break;
                 case Error.Ok:
                     break;
@@ -129,8 +115,34 @@ public class WorldManager : Node
         }
     }
 
+    public void SetNewCurrentRoom(Node setting)
+    {
+        if (setting == currentRoom)
+            return;
+        if (setting == previousRoom)
+        {
+            string path = previousRoomFile;
+            previousRoom = currentRoom;
+            currentRoom = setting;
+            previousRoomFile = currentRoomFile;
+            currentRoomFile = path;
+            return;
+        }
+        if (nextRoom == setting)
+        {
+            previousRoom.QueueFree();
+            previousRoom = currentRoom;
+            previousRoomFile = currentRoomFile;
+            currentRoom = setting;
+            currentRoomFile = nextRoomFile;
+            nextRoom = null;
+        }
+    }
+
     public void LoadArea(string path, Vector3 loc, Vector3 rot)
     {
+        if (nextRoom != null)
+            nextRoom.QueueFree();
         if (currentRoomFile == path || previousRoomFile == path)
             return;
         loader = ResourceLoader.LoadInteractive(path);
@@ -153,5 +165,33 @@ public class WorldManager : Node
         PlayerController.Instance.DeloadPlayer();
         RayCastData.ClearDic();
         PlayerAreaSensor.ResetSensors();
+    }
+
+    public string GetCurrentRoomFile()
+    {
+        return currentRoomFile;
+    }
+
+    public void AddToWorldInfo(string name, object stored)
+    {
+        if (additionalWorldInfo.Contains(name))
+            additionalWorldInfo[name] = stored;
+        else
+            additionalWorldInfo.Add(name, stored);
+    }
+
+    public T GetWorldInfoData<T>(string name)
+    {
+        return (T)additionalWorldInfo[name];
+    }
+
+    public bool WorldInfoHas(string name)
+    {
+        return additionalWorldInfo.Contains(name);
+    }
+
+    public Godot.Collections.Dictionary GetWorldInfo()
+    {
+        return additionalWorldInfo;
     }
 }

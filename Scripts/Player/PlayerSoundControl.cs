@@ -20,4 +20,10 @@ public class PlayerSoundControl : BaseAttatch
         controller.playerSound.Stream = playerStateAudioSamples[(int)state];
         controller.playerSound.Play();
     }
+
+    public void PlaySoundFromFoot(PlayerState state)
+    {
+        controller.playerSound.Stream = playerStateAudioSamples[(int)state];
+        controller.playerSound.Play();
+    }
 }

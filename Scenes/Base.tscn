@@ -1,5 +1,7 @@
-[gd_scene load_steps=20 format=2]
+[gd_scene load_steps=22 format=2]
 
+[ext_resource path="res://Scenes/Environment/SaveStation.tscn" type="PackedScene" id=1]
+[ext_resource path="res://Scenes/Environment/Upgrades.tscn" type="PackedScene" id=2]
 [ext_resource path="res://Materials/Default.tres" type="Material" id=3]
 [ext_resource path="res://Scripts/Environment/TestHit.cs" type="Script" id=4]
 [ext_resource path="res://Scenes/SingleCube.tscn" type="PackedScene" id=5]
@@ -605,6 +607,17 @@ shape = SubResource( 8 )
 [node name="MeshInstance" type="MeshInstance" parent="World/Area/Area"]
 mesh = SubResource( 9 )
 material/0 = null
+
+[node name="Save" parent="World/Area" instance=ExtResource( 1 )]
+transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, -9, 0, -26 )
+
+[node name="Upgrades" parent="World/Area" instance=ExtResource( 2 )]
+transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, -35, 7, 27 )
+upgradeName = "doubleJump"
+
+[node name="Upgrades2" parent="World/Area" instance=ExtResource( 2 )]
+transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, -37, 7, 27 )
+upgradeName = "tripleJump"
 
 [node name="WorldEnvironment" type="WorldEnvironment" parent="World"]
 environment = SubResource( 11 )

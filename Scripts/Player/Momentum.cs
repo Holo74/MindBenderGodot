@@ -144,6 +144,10 @@ public class Momentum : BaseAttatch
                             JumpFinished();
                         }
                         break;
+                    case PlayerState.wallRunning:
+                        JumpFinished();
+                        controller.ability.WallRunningJumpUsed();
+                        break;
                     default:
                         JumpFinished();
                         break;
@@ -174,6 +178,7 @@ public class Momentum : BaseAttatch
         jumpRequest = false;
         SetState(PlayerState.fallingUp);
         JumpAccepted();
+        JumpAccepted = null;
     }
 
     public void GroundMovement(Vector3 direction, float maxSpeed, float acceleration)

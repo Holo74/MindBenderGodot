@@ -39,9 +39,9 @@ public class PlayerUpgrade
     public PlayerUpgrade()
     {
         //Used for debugging and testing
-        Testing();
+        //Testing();
         //Decomment for actual builds and final release
-        //ActualUse();
+        ActualUse();
     }
 
     public PlayerUpgrade(Dictionary currentUpgrades)

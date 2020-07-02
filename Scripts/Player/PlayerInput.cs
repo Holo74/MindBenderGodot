@@ -86,7 +86,7 @@ public class PlayerInput : BaseAttatch
 
     private bool SprintOutput()
     {
-        if (SettingsOptions.toggleSprint)
+        if (SettingsOptions.GetSetting<bool>(SettingsNames.toggleSprint))
         {
             if (!sprintLock)
             {
@@ -110,8 +110,10 @@ public class PlayerInput : BaseAttatch
     {
         if (GameManager.Instance.playing)
         {
-            controller.bodyRotation.RotateAmount(vec.x * timeDelta * SettingsOptions.mouseXSensitivity);
-            controller.headRotation.RotateAmount(vec.y * timeDelta * SettingsOptions.mouseYSensitivity);
+            controller.bodyRotation.RotateAmount(vec.x * timeDelta * SettingsOptions.GetSetting<float>(SettingsNames.mouseXSensitivity) *
+            (SettingsOptions.GetSetting<bool>(SettingsNames.invertX) ? -1 : 1));
+            controller.headRotation.RotateAmount(vec.y * timeDelta * SettingsOptions.GetSetting<float>(SettingsNames.mouseYSensitivity) *
+            (SettingsOptions.GetSetting<bool>(SettingsNames.invertY) ? -1 : 1));
         }
 
     }

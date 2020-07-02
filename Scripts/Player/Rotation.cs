@@ -16,6 +16,12 @@ public class Rotation : BaseAttatch
         xRotation = rotateOnX;
     }
 
+    public void LookForward(Vector3 rotation)
+    {
+        currentRotation = 0;
+        source.Rotation = rotation;
+    }
+
     public void RotateAmount(float amount)
     {
         if (rotationLimit)

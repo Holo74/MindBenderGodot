@@ -218,7 +218,7 @@ public class PlayerAbility : BaseAttatch
             controller.size.Crouch();
     }
 
-    private void WallRunningJumpUsed()
+    public void WallRunningJumpUsed()
     {
         if (RunningOnRightWall || left.Sensed())
             controller.playMovement.HorizontalAccelerationSet(PlayerOptions.wallJumpHorStr * attachedTo.Normals());
@@ -228,16 +228,22 @@ public class PlayerAbility : BaseAttatch
     private void FallingJump()
     {
         cayoteTime = PlayerOptions.cayoteMaxTime;
+        if (currentState == PlayerState.fallingUp)
+            controller.soundControl.PlaySoundFromFoot(PlayerState.fallingUp);
     }
 
     private void UsedDoubleJump()
     {
         DoubleJumpUsed = true;
+        if (currentState == PlayerState.fallingUp)
+            controller.soundControl.PlaySoundFromFoot(PlayerState.fallingUp);
     }
 
     private void UsedTripleJump()
     {
         tripleJumpUsed = true;
+        if (currentState == PlayerState.fallingUp)
+            controller.soundControl.PlaySoundFromFoot(PlayerState.fallingUp);
     }
 
     private void ResetJumps()
@@ -397,7 +403,6 @@ public class PlayerAbility : BaseAttatch
 
     public void WeaponSwapped(CurrentWeaponEquiped newWeapon)
     {
-        GD.Print("Weapon swapped to " + newWeapon);
         weapon = newWeapon;
     }
 

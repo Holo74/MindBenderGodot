@@ -16,6 +16,30 @@ public class PlayerInput : BaseAttatch
         timeDelta = delta;
         bool sprint = SprintOutput();
         bool movedForwardOrBack = false;
+        if (Input.IsActionJustPressed("Debug"))
+        {
+            controller.ability.ChangeNoCollision(!controller.ability.GetNoCollide());
+        }
+        if (controller.ability.GetNoCollide())
+        {
+            if (input.GetInput(Keys.moveForward))
+            {
+                controller.ability.Move(-controller.camera.GlobalTransform.basis.z, sprint);
+            }
+            if (input.GetInput(Keys.moveBack))
+            {
+                controller.ability.Move(controller.camera.GlobalTransform.basis.z, sprint);
+            }
+            if (input.GetInput(Keys.moveLeft))
+            {
+                controller.ability.Move(-controller.camera.GlobalTransform.basis.x, sprint);
+            }
+            if (input.GetInput(Keys.moveRight))
+            {
+                controller.ability.Move(controller.camera.GlobalTransform.basis.x, sprint);
+            }
+            return;
+        }
         bool jumped = false;
         if (input.GetInput(Keys.moveForward))
         {

@@ -54,6 +54,9 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Scripts\AI\AILink.cs" />
+    <Compile Include="Scripts\AI\TestAI\InitialStartup.cs" />
+    <Compile Include="Scripts\AI\TestAI\MasterController.cs" />
     <Compile Include="Scripts\Data\DamageType.cs" />
     <Compile Include="Scripts\Data\Health.cs" />
     <Compile Include="Scripts\Data\HealthKinematic.cs" />
@@ -68,6 +71,7 @@
     <Compile Include="Scripts\Data\SettingsOptions.cs" />
     <Compile Include="Scripts\Environment\CreatingRepeatingPlatforms.cs" />
     <Compile Include="Scripts\Environment\Door.cs" />
+    <Compile Include="Scripts\Environment\HealthPickups.cs" />
     <Compile Include="Scripts\Environment\PosionFog.cs" />
     <Compile Include="Scripts\Environment\ProjectileTrap.cs" />
     <Compile Include="Scripts\Environment\SaveStation.cs" />
@@ -83,6 +87,7 @@
     <Compile Include="Scripts\Menu\MenuButtons\ChangingInpu.cs" />
     <Compile Include="Scripts\Menu\MenuButtons\ConfirmButton.cs" />
     <Compile Include="Scripts\Menu\MenuButtons\ContinueGame.cs" />
+    <Compile Include="Scripts\Menu\MenuButtons\LinkToForm.cs" />
     <Compile Include="Scripts\Menu\MenuButtons\QuitButton.cs" />
     <Compile Include="Scripts\Menu\MenuButtons\QuitToTitleScreen.cs" />
     <Compile Include="Scripts\Menu\MenuButtons\RegectSettings.cs" />

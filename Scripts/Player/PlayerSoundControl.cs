@@ -6,7 +6,7 @@ public class PlayerSoundControl : BaseAttatch
     private AudioStreamSample walking;
     private AudioStreamSample jumped;
     private AudioStreamSample running;
-    private AudioStreamSample[] playerStateAudioSamples = new AudioStreamSample[10];
+    private AudioStreamSample[] playerStateAudioSamples = new AudioStreamSample[11];
     public PlayerSoundControl(PlayerController controller) : base(controller, false)
     {
         controller.ability.AddToStateChange(UpdateSound);

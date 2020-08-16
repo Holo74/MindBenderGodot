@@ -77,7 +77,6 @@ __meta__ = {
 }
 
 [node name="Game" type="Panel" parent="."]
-visible = false
 anchor_right = 1.0
 anchor_bottom = 1.0
 __meta__ = {
@@ -107,6 +106,9 @@ script = ExtResource( 4 )
 __meta__ = {
 "_edit_use_anchors_": true
 }
+useDemoLevels = true
+pathwayToDemoLevel = "res://Scenes/TestingLevels/TreeTesting/AboveTheCatapillar/ATC1.tscn"
+textUsed = "ATC-1"
 
 [node name="Button3" type="Button" parent="Game"]
 anchor_left = 0.4375
@@ -120,6 +122,9 @@ __meta__ = {
 "_edit_use_anchors_": true
 }
 saveSlot = 1
+useDemoLevels = true
+pathwayToDemoLevel = "res://Scenes/TestingLevels/TreeTesting/AboveTheCatapillar/ATC2.tscn"
+textUsed = "ATC-2"
 
 [node name="Button4" type="Button" parent="Game"]
 anchor_left = 0.4375
@@ -133,8 +138,12 @@ __meta__ = {
 "_edit_use_anchors_": true
 }
 saveSlot = 2
+useDemoLevels = true
+pathwayToDemoLevel = "res://Scenes/TestingLevels/TreeTesting/AboveTheCatapillar/ATC3.tscn"
+textUsed = "ATC-3"
 
 [node name="OptionsMenu" type="Panel" parent="."]
+visible = false
 anchor_right = 1.0
 anchor_bottom = 1.0
 __meta__ = {
@@ -149,7 +158,6 @@ __meta__ = {
 }
 
 [node name="Settings" type="Tabs" parent="OptionsMenu/TabContainer"]
-visible = false
 anchor_right = 1.0
 anchor_bottom = 1.0
 margin_left = 4.0
@@ -317,6 +325,7 @@ __meta__ = {
 }
 
 [node name="Inputs" type="Tabs" parent="OptionsMenu/TabContainer"]
+visible = false
 anchor_right = 1.0
 anchor_bottom = 1.0
 margin_left = 4.0

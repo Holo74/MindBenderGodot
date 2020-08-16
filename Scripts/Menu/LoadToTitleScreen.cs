@@ -9,7 +9,7 @@ public class LoadToTitleScreen : Node
     {
         if (GameManager.Instance.AllDataLoaded)
         {
-            GetTree().ChangeScene("res://Scenes/MainMenu.tscn");
+            GetTree().ChangeScene("res://Scenes/Menus/MainMenu.tscn");
         }
     }
 }

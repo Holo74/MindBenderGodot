@@ -7,14 +7,15 @@ public class Momentum : BaseAttatch
     public Momentum(PlayerController controller) : base(controller, true) { }
     private Vector3 groundMove = new Vector3();
     private Vector3 horizontalAcc = new Vector3();
-    private Vector3 verticalMove = new Vector3();
+    private Vector3 verticalMove = new Vector3(), verticalAddition = new Vector3();
     private Vector3 stableMove = new Vector3();
     private Vector3 pushing = new Vector3();
+    private Vector3 fallbackMovement = new Vector3();
     private float currentSpeed = 0;
     private bool moved = false;
     private float NinetyDegreesToRad = Mathf.Deg2Rad(-90);
     private RayInfo groundData { get { return RayCastData.SurroundingCasts[RayDirections.Bottom]; } }
-    private bool groundColliding { get { return PlayerAreaSensor.GetArea(AreaSensorDirection.Bottom); } }
+    private bool groundColliding { get { return PlayerAreaSensor.GetArea(AreaSensorDirection.Bottom) || controller.ability.GetNoCollide(); } }
     private float maxSpeed = 1;
     private float maxAirSpeed = 0;
     private float accelerate = 1f, currentAccelerationTime = 6f;
@@ -92,13 +93,15 @@ public class Momentum : BaseAttatch
                 if (currentSpeed > maxSpeed)
                     currentSpeed = Mathf.Clamp(currentSpeed - time * PlayerOptions.playerDeccelerationAboveMax, maxSpeed, currentSpeed);
             }
-            if (groundData.colliding)
+            if (!groundData.colliding || controller.ability.GetNoCollide())
             {
-                controller.MoveAndSlideWithSnap(groundData.normal.Cross(stableMove.Rotated(Vector3.Up, NinetyDegreesToRad)).Normalized() * currentSpeed * accelerate, Vector3.Down);
+                controller.MoveAndSlide(stableMove.Normalized() * currentSpeed * accelerate);
+                verticalAddition *= 0;
             }
             else
             {
-                controller.MoveAndSlide(stableMove.Normalized() * currentSpeed * accelerate);
+                verticalAddition = groundData.normal.Cross(stableMove.Rotated(Vector3.Up, NinetyDegreesToRad)).Normalized();
+                controller.MoveAndSlide(verticalAddition * currentSpeed * accelerate);
             }
             horizontalAcc -= horizontalAcc * time * .9f;
         }
@@ -169,12 +172,16 @@ public class Momentum : BaseAttatch
         }
         pushing = Vector3.Zero;
         if (controller.ability.GetCurrentState() != PlayerState.slide)
+        {
             moved = false;
+        }
+
     }
 
     private void JumpFinished()
     {
-        verticalMove = Vector3.Up * jumpStrRequest;
+        if (groundColliding)
+            verticalMove = (Vector3.Up * jumpStrRequest) + verticalAddition * Vector3.Up;
         jumpRequest = false;
         SetState(PlayerState.fallingUp);
         JumpAccepted();
@@ -184,7 +191,10 @@ public class Momentum : BaseAttatch
     public void GroundMovement(Vector3 direction, float maxSpeed, float acceleration)
     {
         if (!moved && groundColliding)
+        {
+            fallbackMovement = stableMove;
             stableMove = Vector3.Zero;
+        }
         moved = true;
         if (groundColliding)
         {
@@ -197,6 +207,8 @@ public class Momentum : BaseAttatch
     public void AirMovement(Vector3 direction, float control)
     {
         moved = true;
+        if (stableMove == Vector3.Zero)
+            stableMove = fallbackMovement;
         stableMove += direction * time * control * (Mathf.Clamp(currentSpeed, 1, maxAirSpeed) / Mathf.Clamp(maxAirSpeed, 1, 100));
         if (stableMove.Length() > maxAirSpeed)
             stableMove *= (maxAirSpeed / stableMove.Length());
@@ -277,6 +289,8 @@ public class Momentum : BaseAttatch
 
     public void LandingSignal(bool state)
     {
+        if (controller.ability.GetNoCollide())
+            return;
         if (state)
         {
             if (verticalMove.y < -15f)

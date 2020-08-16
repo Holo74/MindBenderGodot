@@ -4,6 +4,29 @@ using System;
 //This controls how the abilities work and to process all the filtered inputs
 public class PlayerAbility : BaseAttatch
 {
+    private bool noCollision = false;
+
+    public bool GetNoCollide()
+    {
+        return noCollision;
+    }
+
+    public void ChangeNoCollision(bool state = false)
+    {
+        noCollision = state;
+        controller.playMovement.Stop();
+        uint l = state ? 0u : 1u;
+        controller.CollisionLayer = l;
+        controller.CollisionMask = l;
+        if (state)
+        {
+            ChangeState(PlayerState.noClip);
+        }
+        else
+        {
+            ChangeState(PlayerState.empty);
+        }
+    }
     //Needs to be update with the actual weapons
     public PlayerAbility(PlayerController controller) : base(controller, true)
     {
@@ -62,6 +85,7 @@ public class PlayerAbility : BaseAttatch
     {
         switch (currentState)
         {
+            case PlayerState.noClip:
             case PlayerState.standing:
             case PlayerState.sprinting:
             case PlayerState.walking:
@@ -412,6 +436,14 @@ public class PlayerAbility : BaseAttatch
     }
     public void ChangeState(PlayerState state)
     {
+        if (currentState == PlayerState.noClip)
+        {
+            if (state == PlayerState.empty)
+            {
+                currentState = state;
+            }
+            return;
+        }
         if (currentState != state)
         {
             currentState = state;
@@ -466,5 +498,6 @@ public enum PlayerState
     sprinting,
     crouch,
     glide,
-    slide
+    slide,
+    noClip
 }

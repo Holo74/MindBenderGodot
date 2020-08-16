@@ -14,15 +14,18 @@ public class InGameMenu : MenuBase
     private float timer = 4f, savingBuffer = 1f;
     private bool saving = false;
     public string inputMapAction = "";
+    private AnimationPlayer animations;
     public override void _Ready()
     {
         GameManager.Instance.currentMenu = this;
-        foreach (Control c in GetChildren())
+        foreach (Node c in GetChildren())
         {
-            c.Visible = false;
+            if (c is Control a)
+                a.Visible = false;
         }
         GameManager.Instance.Connect(nameof(GameManager.ToggleGame), this, nameof(ToggleMenu));
         PlayerController.Instance.Connect(nameof(PlayerController.TakingDamage), this, nameof(UpdateHealth));
+        PlayerController.Instance.AttachToDeath(Dead);
         hud = GetChild<Control>(0);
         menu = GetChild<Control>(1);
         savingRequest = GetChild<Control>(3);
@@ -32,7 +35,8 @@ public class InGameMenu : MenuBase
         healthBar = healthContainer.GetChild<ProgressBar>(0);
         displayText = GetChild(0).GetChild<RichTextLabel>(5);
         instance = this;
-
+        animations = GetChild<AnimationPlayer>(6);
+        PlayerController.Instance.ability.AddToStateChange(PlayerStateAnimations);
     }
 
     public override void _Process(float delta)
@@ -68,8 +72,7 @@ public class InGameMenu : MenuBase
     {
         if (state)
         {
-            hud.Visible = true;
-            mainNode.Visible = false;
+            SwapToHud();
             SettingsOptions.ResetNewSettings();
             mainNode = menu;
         }
@@ -91,9 +94,14 @@ public class InGameMenu : MenuBase
         healthBar.Value = (newValue - 1) % 100;
     }
 
+    private void Dead()
+    {
+        healthBar.Value = 0;
+    }
+
     public void ReadyMenu()
     {
-        hud.Visible = true;
+        SwapToHud();
     }
 
     public void SaveGameConfirmed(bool saved)
@@ -116,5 +124,34 @@ public class InGameMenu : MenuBase
     {
         mainNode = savingRequest;
         GameManager.Instance.ToggleGamePause();
+    }
+
+    private void SwapToHud()
+    {
+        mainNode.Visible = false;
+        hud.Visible = true;
+        hud.RectPosition = Vector2.Zero;
+    }
+
+    public Control Hud()
+    {
+        return hud;
+    }
+
+    private void PlayerStateAnimations(PlayerState state)
+    {
+        switch (state)
+        {
+            case PlayerState.standing:
+                animations.CurrentAnimation = "Idle";
+                break;
+            case PlayerState.walking:
+                animations.CurrentAnimation = "Walking";
+                break;
+            case PlayerState.crouch:
+                break;
+            case PlayerState.fallingDown:
+                break;
+        }
     }
 }

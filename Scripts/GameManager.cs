@@ -5,6 +5,7 @@ using Godot.Collections;
 //This is such a fucking mess that I need to fix and redo when the other parts of the game start to come into play
 public class GameManager : Node
 {
+    public static string StartingLevelPath = "res://Scenes/WhiteBoxes/TreeLevelWhiteBox.tscn";
     private static GameManager instance;
     public static GameManager Instance { get { return instance; } }
     public Node Root { get { return GetTree().Root; } }
@@ -44,7 +45,7 @@ public class GameManager : Node
         StartGame(datas[i].SavedInPath[SavedData.SavedAreaPath].ToString());
     }
 
-    public void StartGame(string loadArea = "res://Scenes/Base.tscn")
+    public void StartGame(string loadArea = "res://Scenes/WhiteBoxes/TreeLevelWhiteBox.tscn")
     {
         startingAreaPath = loadArea;
         GetTree().ChangeScene("res://Scenes/WorldManager.tscn");
@@ -83,7 +84,7 @@ public class GameManager : Node
     {
         GetTree().Paused = false;
         Input.SetMouseMode(Input.MouseMode.Visible);
-        GetTree().ChangeScene("res://Scenes/MainMenu.tscn");
+        GetTree().ChangeScene("res://Scenes/Menus/MainMenu.tscn");
         EmitSignal(nameof(ReturnToTitle));
         dataUsed = -1;
     }

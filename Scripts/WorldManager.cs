@@ -20,13 +20,15 @@ public class WorldManager : Node
     private Node previousRoom, currentRoom, nextRoom;
     private string previousRoomFile, currentRoomFile, nextRoomFile;
     private Godot.Collections.Dictionary additionalWorldInfo;
+    private Navigation navigation;
     public override void _Ready()
     {
         instance = this;
         additionalWorldInfo = GameManager.Instance.GetDataUsed().SavedInPath;
         loadingBar = GetChild(0).GetChild<ProgressBar>(1);
+        navigation = GetChild<Navigation>(1);
         loadingPaths.Enqueue("res://Scenes/Player.tscn");
-        loadingPaths.Enqueue("res://Scenes/InGameMenu.tscn");
+        loadingPaths.Enqueue("res://Scenes/Menus/InGameMenu.tscn");
         loadingPaths.Enqueue(GameManager.Instance.startingAreaPath);
         currentRoomFile = GameManager.Instance.startingAreaPath;
         waitFrame = 1;
@@ -45,8 +47,8 @@ public class WorldManager : Node
             if (loadingBar.Value == 100 && waitFrame <= 0)
             {
                 Spatial spawn = new Spatial();
-                if (GetTree().HasGroup("RespawnLocation"))
-                    spawn = (Spatial)GetTree().GetNodesInGroup("RespawnLocation")[0];
+                if (GetTree().HasGroup("Spawn"))
+                    spawn = (Spatial)GetTree().GetNodesInGroup("Spawn")[0];
                 PlayerController.Instance.ReadyPlayer(spawn.GlobalTransform.origin, spawn.Rotation);
                 PlayerController.Instance.UpdateCharacterSettings();
                 RemoveChild(GetChild(0));
@@ -65,7 +67,7 @@ public class WorldManager : Node
                     loader.Dispose();
                     Node node = holder.Instance();
                     loader = null;
-                    AddChild(node);
+                    navigation.AddChild(node);
                     if (loadingPaths.Count == 0)
                     {
                         currentRoom = node;
@@ -100,7 +102,7 @@ public class WorldManager : Node
                     loader = null;
                     node.Translate(loadLocation);
                     node.Rotation = loadRotation;
-                    AddChild(node);
+                    navigation.AddChild(node);
                     EmitSignal(nameof(AreaLoaded));
                     loadingDone?.Invoke();
                     loadingDone = null;
@@ -193,5 +195,10 @@ public class WorldManager : Node
     public Godot.Collections.Dictionary GetWorldInfo()
     {
         return additionalWorldInfo;
+    }
+
+    public Navigation GetNavigation()
+    {
+        return navigation;
     }
 }

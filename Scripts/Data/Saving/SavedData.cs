@@ -9,7 +9,7 @@ public class SavedData
     {
         SavedInPath = new Dictionary();
         upgrades = new PlayerUpgrade();
-        SavedInPath.Add(SavedAreaPath, "res://Scenes/Start.tscn");
+        SavedInPath.Add(SavedAreaPath, GameManager.StartingLevelPath);
         SavedInPath.Add(SavedGameName, "New Game");
     }
     public SavedData(Dictionary playerUpgrades, Dictionary additionalInfo)

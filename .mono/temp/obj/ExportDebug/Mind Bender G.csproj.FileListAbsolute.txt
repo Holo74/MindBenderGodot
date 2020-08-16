@@ -1,0 +1,6 @@
+/home/holo74/Documents/MindBenderG/.mono/temp/bin/ExportDebug/Mind Bender G.dll
+/home/holo74/Documents/MindBenderG/.mono/temp/bin/ExportDebug/Mind Bender G.pdb
+/home/holo74/Documents/MindBenderG/.mono/temp/obj/ExportDebug/Mind Bender G.csprojAssemblyReference.cache
+/home/holo74/Documents/MindBenderG/.mono/temp/obj/ExportDebug/Mind Bender G.csproj.CoreCompileInputs.cache
+/home/holo74/Documents/MindBenderG/.mono/temp/obj/ExportDebug/Mind Bender G.dll
+/home/holo74/Documents/MindBenderG/.mono/temp/obj/ExportDebug/Mind Bender G.pdb

@@ -35,3 +35,5 @@ text = "Loading"
 __meta__ = {
 "_edit_use_anchors_": true
 }
+
+[node name="Navigation" type="Navigation" parent="."]
